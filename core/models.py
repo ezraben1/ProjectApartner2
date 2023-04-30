@@ -27,16 +27,7 @@ class CustomUser(AbstractUser):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
-
-
-class ApartmentImage(models.Model):
-    image = models.ImageField(
-        upload_to="core/images",
-        validators=[validate_file_size],
-        help_text=_("The image of the apartment."),
-        null=True,
-        blank=True,
-    )
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
 
 class Apartment(models.Model):
@@ -70,20 +61,28 @@ class Apartment(models.Model):
         default=False, help_text=_("Whether the apartment has air conditioning.")
     )
 
-    image = models.ForeignKey(
-        ApartmentImage,
-        on_delete=models.CASCADE,
-        related_name="apartment",
-        help_text=_("The imgages of the apartments."),
-        null=True,
-        blank=True,
-    )
-
     def __str__(self) -> str:
         return self.address
 
     class Meta:
         ordering = ["address"]
+
+
+class ApartmentImage(models.Model):
+    image = models.ImageField(
+        upload_to="apartment_images/",
+        validators=[validate_file_size],
+        help_text=_("The image of the apartment."),
+        null=True,
+        blank=True,
+    )
+    apartment = models.ForeignKey(
+        Apartment,
+        on_delete=models.CASCADE,
+        related_name="images",
+        blank=True,
+        null=True,
+    )
 
 
 class Contract(models.Model):
@@ -99,10 +98,6 @@ class Contract(models.Model):
         max_digits=8, decimal_places=2, validators=[MinValueValidator(1)]
     )
     terms_and_conditions = models.TextField(blank=True, null=True)
-
-
-class RoomImage(models.Model):
-    image = models.ImageField(upload_to="core/images", validators=[validate_file_size])
 
 
 class Room(models.Model):
@@ -127,13 +122,6 @@ class Room(models.Model):
     size = models.CharField(max_length=50)
     window = models.BooleanField(default=False, blank=True)
     ac = models.BooleanField(default=False)
-    image = models.ForeignKey(
-        RoomImage,
-        on_delete=models.CASCADE,
-        related_name="images",
-        null=True,
-        blank=True,
-    )
 
     def __str__(self) -> str:
         return f"{self.apartment.address}, Room {self.id}"
@@ -145,6 +133,19 @@ class Room(models.Model):
 
     class Meta:
         ordering = ["price_per_month"]
+
+
+class RoomImage(models.Model):
+    image = models.ImageField(
+        upload_to="room_images/",
+        validators=[validate_file_size],
+        help_text=_("The image of the room."),
+        null=True,
+        blank=True,
+    )
+    room = models.ForeignKey(
+        Room, on_delete=models.CASCADE, related_name="images", blank=True, null=True
+    )
 
 
 class BillFile(models.Model):

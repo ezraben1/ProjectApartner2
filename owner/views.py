@@ -6,6 +6,7 @@ from rest_framework import permissions, status
 from core.views import ApartmentViewSet, RoomViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class OwnerApartmentViewSet(ApartmentViewSet):
@@ -21,6 +22,21 @@ class OwnerApartmentViewSet(ApartmentViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    @action(
+        detail=True, methods=["patch"], parser_classes=[FormParser, MultiPartParser]
+    )
+    def upload_image(self, request, pk=None):
+        apartment = self.get_object()
+        serializer = serializers.ApartmentImageSerializer(
+            data=request.data, context={"apartment_id": apartment.id}
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True)
     def contracts(self, request, pk=None):
@@ -39,6 +55,7 @@ class OwnerApartmentViewSet(ApartmentViewSet):
 
 class OwnerRoomViewSet(RoomViewSet):
     lookup_field = "apartment_id"
+    parser_classes = (MultiPartParser,)
 
     def get_queryset(self):
         user = self.request.user

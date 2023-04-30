@@ -13,13 +13,11 @@ from core.pagination import DefaultPagination
 from core.permissions import (
     IsApartmentOwner,
     IsAuthenticated,
-    IsOwnerOrReadOnly,
     IsSearcher,
 )
 from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.urls import reverse
-from rest_framework.exceptions import ValidationError
 
 
 class ApartmentViewSet(ModelViewSet):
@@ -226,8 +224,15 @@ class CustomUserViewSet(ModelViewSet):
     serializer_class = serializers.CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=True, methods=["patch"])
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
     def get_queryset(self):
-        return CustomUser.objects.filter(id=self.request.user.id)
+        user = self.request.user
+        if self.action == "patch":
+            return CustomUser.objects.filter(id=user.id)
+        return CustomUser.objects.all()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -245,6 +250,19 @@ class CustomUserViewSet(ModelViewSet):
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # If the avatar field is included in the request, save the file and update the user model
+        if "avatar" in request.FILES:
+            instance.avatar = request.FILES["avatar"]
+            instance.save()
+
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class ContractViewSet(ModelViewSet):

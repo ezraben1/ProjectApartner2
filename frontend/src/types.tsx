@@ -12,21 +12,22 @@ export interface CustomUser {
   }
   
   export interface Apartment {
-    rooms: any;
     id: number;
     owner: CustomUser;
     address: string;
-    description: string | null;
+    description: string;
     size: string;
     balcony: boolean | null;
     bbq_allowed: boolean;
     smoking_allowed: boolean;
     allowed_pets: boolean;
-    ac: boolean;
     images: ApartmentImage[];
+    rooms?: Room[];
+    ac: boolean;
   }
   
   export interface ApartmentImage {
+    url: string;
     id: number;
     apartment: Apartment;
     image: string; // URL of the image

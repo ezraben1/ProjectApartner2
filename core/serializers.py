@@ -1,17 +1,16 @@
 from rest_framework import serializers
-from .models import Room, Apartment, RoomImage, Review, CustomUser, Contract, Bill
+from .models import (
+    ApartmentImage,
+    Room,
+    Apartment,
+    RoomImage,
+    Review,
+    CustomUser,
+    Contract,
+    Bill,
+)
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-
-
-class ApartmentImageSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        apartment_id = self.context["apartment_id"]
-        return RoomImage.objects.create(apartment_id=apartment_id, **validated_data)
-
-    class Meta:
-        model = RoomImage
-        fields = ["id", "image"]
 
 
 class BillSerializer(serializers.ModelSerializer):
@@ -45,10 +44,23 @@ class BillSerializer(serializers.ModelSerializer):
         return data
 
 
+class ApartmentImageSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        apartment_id = self.context["apartment_id"]
+        return ApartmentImage.objects.create(
+            apartment_id=apartment_id, **validated_data
+        )
+
+    class Meta:
+        model = RoomImage
+        fields = ["id", "image"]
+
+
 class ApartmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.email")
     rooms = serializers.SerializerMethodField()
     bill_ids = serializers.SerializerMethodField()
+    images = ApartmentImageSerializer(many=True, read_only=True)
 
     def get_rooms(self, obj):
         rooms_queryset = obj.rooms.all()
@@ -62,17 +74,16 @@ class ApartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apartment
-        fields = ["id", "owner", "address", "description", "size", "bill_ids", "rooms"]
-
-
-class RoomImageSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        room_id = self.context["room_id"]
-        return RoomImage.objects.create(room_id=room_id, **validated_data)
-
-    class Meta:
-        model = RoomImage
-        fields = ["id", "image"]
+        fields = [
+            "id",
+            "owner",
+            "address",
+            "description",
+            "size",
+            "bill_ids",
+            "rooms",
+            "images",
+        ]
 
 
 class ContractSerializer(serializers.ModelSerializer):
@@ -92,6 +103,16 @@ class ContractSerializer(serializers.ModelSerializer):
             "deposit_amount",
             "rent_amount",
         ]
+
+
+class RoomImageSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        room_id = self.context["room_id"]
+        return RoomImage.objects.create(room_id=room_id, **validated_data)
+
+    class Meta:
+        model = RoomImage
+        fields = ["id", "image"]
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -119,6 +140,7 @@ class RoomSerializer(serializers.ModelSerializer):
             "contract",
             "renter",
             "apartment",
+            "images",
         ]
 
     def create(self, validated_data):
@@ -158,7 +180,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "user_type",
             "first_name",
             "last_name",
+            "avatar",
         )
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
         password = validated_data.pop("password")

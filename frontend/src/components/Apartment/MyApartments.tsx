@@ -2,9 +2,22 @@ import { useEffect, useState } from 'react';
 import { Apartment, Room } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
 import { useUserType } from '../../utils/useUserType';
-import { VStack, Button, Heading, Text, Box, List, ListItem, Flex } from '@chakra-ui/react';
+import { VStack, Button, Heading, Text, Box, List, ListItem, Flex, Image } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import AddApartmentForm from './AddApartmentForm';
+
+const ApartmentThumbnail: React.FC<{ src: string }> = ({ src }) => {
+  return (
+    <Image
+      src={src}
+      alt="Apartment thumbnail"
+      width="100px"
+      height="100px"
+      objectFit="cover"
+      borderRadius="md"
+    />
+  );
+};
 
 const MyApartments: React.FC = () => {
   const [apartments, setApartments] = useState<Apartment[]>([]);
@@ -58,10 +71,12 @@ const MyApartments: React.FC = () => {
                 <Flex justify="space-between" align="center">
                   <Heading size="md">{apartment.address}</Heading>
                   <Text fontSize="lg" color="red.500">{apartment.address}</Text>
+                  <ApartmentThumbnail src={apartment.images[0]?.url || ''} />
+
                 </Flex>
                 <Text>{apartment.description}</Text>
                 <List spacing={3}>
-                  {apartment.rooms.map((room: Room) => (
+                {apartment.rooms?.map((room: Room) => (
                     <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
                       <ListItem
                         p="4"

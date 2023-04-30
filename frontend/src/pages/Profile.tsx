@@ -9,7 +9,10 @@ import {
   FormLabel,
   Input,
   Button,
-  Container 
+  Container,
+  Avatar,
+  VStack,
+  HStack
 } from "@chakra-ui/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Row, Col } from "react-bootstrap";
@@ -20,6 +23,8 @@ interface User {
   email: string;
   first_name: string;
   last_name: string;
+  avatar: string | null;
+
 }
 
 function Profile() {
@@ -27,6 +32,7 @@ function Profile() {
   const [updatedUser, setUpdatedUser] = useState<User | null>(null);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,10 +71,29 @@ function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!updatedUser) return;
-
+  
+    const formData = new FormData();
+  
+    if (selectedFile) {
+      formData.append("avatar", selectedFile);
+    }
+  
+    if (updatedUser) {
+      Object.entries(updatedUser).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+    }
+  
     try {
-      const response = await api.patch(`/core/me/${user?.id}/`, updatedUser);
+      const response = await api.patch(
+        `/core/me/${user?.id}/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -76,6 +101,15 @@ function Profile() {
     } catch (error) {
       setIsError(true);
       setErrorMessage((error as Error).message);
+    }
+  };
+  
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    } else {
+      setSelectedFile(null);
     }
   };
 
@@ -88,9 +122,16 @@ function Profile() {
       <Row>
         <Col>
           <Box p={6} boxShadow="xl" borderRadius="lg">
-            <Heading mb={6} fontSize="4xl" fontWeight="bold" textAlign="center">
-              Profile
-            </Heading>
+          <Heading mb={6} fontSize="4xl" fontWeight="bold" textAlign="center">
+          Profile
+              </Heading>
+              <VStack spacing={4} alignItems="stretch">
+                  <Avatar
+                    src={user.avatar || "https://via.placeholder.com/150"}
+                    size="2xl"
+                    mb={6}
+                    alignSelf="center"
+                  />
             {isError && (
               <Alert status="error" mb={6}>
                 <AlertIcon />
@@ -173,26 +214,47 @@ function Profile() {
                 }}
               />
             </FormControl>
-            <Button
-              colorScheme="blue"
-              size="lg"
-              mr={4}
-              onClick={handleSubmit}
-              disabled={!updatedUser}
+            <FormControl mb={4}>
+            <FormLabel fontSize="xl">Profile Picture:</FormLabel>
+            <Input
+              type="file"
+              name="avatar"
+              accept="image/*"
+              onChange={handleFileChange}
               borderRadius="full"
-              _hover={{ bg: "blue.500" }}
-            >
-              Update
-            </Button>
-            <Button
-              colorScheme="red"
-              size="lg"
-              onClick={handleDeleteAccount}
-              borderRadius="full"
-              _hover={{ bg: "red.500" }}
-            >
-              Delete Account
-            </Button>
+              borderColor="gray.300"
+              borderWidth="2px"
+              py={4}
+              px={6}
+              _focus={{
+                outline: "none",
+                boxShadow: "outline",
+                borderColor: "blue.500",
+              }}
+            />
+          </FormControl>
+            <HStack spacing={4}>
+              <Button
+                colorScheme="blue"
+                size="lg"
+                onClick={handleSubmit}
+                disabled={!updatedUser}
+                borderRadius="full"
+                _hover={{ bg: "blue.500" }}
+              >
+                Update
+              </Button>
+              <Button
+                colorScheme="red"
+                size="lg"
+                onClick={handleDeleteAccount}
+                borderRadius="full"
+                _hover={{ bg: "red.500" }}
+              >
+                Delete Account
+              </Button>
+            </HStack>
+          </VStack>
           </Box>
         </Col>
       </Row>

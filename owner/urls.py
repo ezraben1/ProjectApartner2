@@ -6,13 +6,18 @@ from core.views import ApartmentViewSet, ContractViewSet, BillViewSet, RoomViewS
 app_name = "owner"
 
 router = routers.DefaultRouter()
-router.register("owner-apartments", ApartmentViewSet, basename="apartments")
+router.register("owner-apartments", views.OwnerApartmentViewSet, basename="apartments")
 router.register("owner-rooms", views.OwnerRoomViewSet, basename="rooms")
 router.register("owner-contarcts", ContractViewSet, basename="contracts")
 router.register("owner-bills", BillViewSet, basename="bills")
 
 
 urlpatterns = [
+    path(
+        "apartments/<int:pk>/upload_image/",
+        views.ApartmentViewSet.as_view({"patch": "upload_image"}),
+        name="apartment-upload-image",
+    ),
     path(
         "owner-apartments/<int:apartment_id>/rooms/",
         views.OwnerRoomViewSet.as_view(

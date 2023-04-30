@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import Cookies from 'js-cookie';
 
 const api: AxiosInstance = axios.create({
@@ -67,14 +67,15 @@ const get = async (url: string, options?: any): Promise<Response> => {
   });
 };
 
-const patch = async (url: string, data: any): Promise<Response> => {
+const patch = async (url: string, data: any, config?: AxiosRequestConfig): Promise<Response> => {
   const response = await api.request({
     url,
     method: 'PATCH',
     data,
+    ...config,
   });
 
-  const headers: HeadersInit = Object.entries(response.headers).reduce(
+  const responseHeaders: HeadersInit = Object.entries(response.headers).reduce(
     (acc: { [key: string]: string }, [key, value]) => {
       acc[key] = value;
       return acc;
@@ -85,7 +86,7 @@ const patch = async (url: string, data: any): Promise<Response> => {
   return new Response(JSON.stringify(response.data), {
     status: response.status,
     statusText: response.statusText,
-    headers,
+    headers: responseHeaders,
   });
 };
 
