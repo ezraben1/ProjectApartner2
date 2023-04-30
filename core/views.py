@@ -101,9 +101,10 @@ class PublicRoomViewSet(ReadOnlyModelViewSet):
     pagination_class = DefaultPagination
     search_fields = ["address", "size"]
     ordering_fields = ["price_per_month"]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        return Room.objects.prefetch_related("images").filter(renter=None)
+        return Room.objects.filter(renter=None)
 
 
 class RoomViewSet(ModelViewSet):
@@ -295,10 +296,23 @@ class BillViewSet(ModelViewSet):
         """
         Set the created_by field to the current user, and set the apartment owner to the current user.
         """
+        user = self.request.user
+        apartment = serializer.validated_data["apartment"]
+        if apartment.owner != user:
+            raise serializers.ValidationError(
+                "You are not the owner of this apartment."
+            )
         serializer.save(
-            created_by=self.request.user,
-            apartment=serializer.validated_data["apartment_id"].owner,
+            created_by=user,
+            apartment=apartment,
         )
+
+    def get_apartment(self):
+        apartment_id = self.kwargs.get("apartment_id")
+        apartment = get_object_or_404(
+            Apartment, id=apartment_id, owner=self.request.user
+        )
+        return apartment
 
 
 class ReviewViewSet(ModelViewSet):

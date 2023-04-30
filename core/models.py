@@ -29,6 +29,16 @@ class CustomUser(AbstractUser):
     date_joined = models.DateTimeField(auto_now_add=True)
 
 
+class ApartmentImage(models.Model):
+    image = models.ImageField(
+        upload_to="core/images",
+        validators=[validate_file_size],
+        help_text=_("The image of the apartment."),
+        null=True,
+        blank=True,
+    )
+
+
 class Apartment(models.Model):
     owner = models.ForeignKey(
         CustomUser,
@@ -59,27 +69,21 @@ class Apartment(models.Model):
     ac = models.BooleanField(
         default=False, help_text=_("Whether the apartment has air conditioning.")
     )
-    # images =
+
+    image = models.ForeignKey(
+        ApartmentImage,
+        on_delete=models.CASCADE,
+        related_name="apartment",
+        help_text=_("The imgages of the apartments."),
+        null=True,
+        blank=True,
+    )
 
     def __str__(self) -> str:
         return self.address
 
     class Meta:
         ordering = ["address"]
-
-
-class ApartmentImage(models.Model):
-    apartment = models.ForeignKey(
-        Apartment,
-        on_delete=models.CASCADE,
-        related_name="images",
-        help_text=_("The apartment the image belongs to."),
-    )
-    image = models.ImageField(
-        upload_to="core/images",
-        validators=[validate_file_size],
-        help_text=_("The image of the apartment."),
-    )
 
 
 class Contract(models.Model):
@@ -95,6 +99,10 @@ class Contract(models.Model):
         max_digits=8, decimal_places=2, validators=[MinValueValidator(1)]
     )
     terms_and_conditions = models.TextField(blank=True, null=True)
+
+
+class RoomImage(models.Model):
+    image = models.ImageField(upload_to="core/images", validators=[validate_file_size])
 
 
 class Room(models.Model):
@@ -119,6 +127,13 @@ class Room(models.Model):
     size = models.CharField(max_length=50)
     window = models.BooleanField(default=False, blank=True)
     ac = models.BooleanField(default=False)
+    image = models.ForeignKey(
+        RoomImage,
+        on_delete=models.CASCADE,
+        related_name="images",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self) -> str:
         return f"{self.apartment.address}, Room {self.id}"
@@ -132,9 +147,8 @@ class Room(models.Model):
         ordering = ["price_per_month"]
 
 
-class RoomImage(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="core/images", validators=[validate_file_size])
+class BillFile(models.Model):
+    file = models.FileField(upload_to="bill_files/")
 
 
 class Bill(models.Model):
@@ -166,7 +180,13 @@ class Bill(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    document = models.FileField(upload_to="bill_documents/", blank=True, null=True)
+    bill_file = models.ForeignKey(
+        BillFile,
+        on_delete=models.CASCADE,
+        related_name="bill",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ["-date"]
@@ -175,11 +195,6 @@ class Bill(models.Model):
         return (
             f"{self.get_bill_type_display()} bill for {self.apartment} on {self.date}"
         )
-
-
-class BillFile(models.Model):
-    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, related_name="files")
-    file = models.FileField(upload_to="bill_files/")
 
 
 class Review(models.Model):

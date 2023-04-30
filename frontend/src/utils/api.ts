@@ -51,6 +51,7 @@ const getUserDetails = async (): Promise<Response> => {
     headers,
   });
 };
+
 const get = async (url: string, options?: any): Promise<Response> => {
   const response = await api.get(url, options);
 
@@ -105,11 +106,34 @@ const remove = async (url: string): Promise<Response> => {
   });
 };
 
+const put = async (url: string, data: any): Promise<Response> => {
+  const response = await api.request({
+    url,
+    method: 'PUT',
+    data,
+  });
+
+  const headers: HeadersInit = Object.entries(response.headers).reduce(
+    (acc: { [key: string]: string }, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    },
+    {}
+  );
+
+  return new Response(JSON.stringify(response.data), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+};
+
 export default {
   post,
   get,
   getUserDetails,
   patch,
-  remove
+  remove,
+  put
 };
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Room, Apartment, RoomImage, Review, CustomUser, Contract, Bill
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 
 class ApartmentImageSerializer(serializers.ModelSerializer):
@@ -24,17 +25,23 @@ class BillSerializer(serializers.ModelSerializer):
             "date",
             "created_by",
             "created_at",
-            "document",
         ]
         read_only_fields = ["created_by", "created_at"]
 
     def validate(self, data):
+        # Validate apartment ownership
         user = self.context["request"].user
         apartment = data["apartment"]
         if apartment.owner != user:
             raise serializers.ValidationError(
                 "You are not the owner of this apartment."
             )
+
+        # Validate date is not in the future
+        date = data["date"]
+        if date > timezone.localdate():
+            raise serializers.ValidationError("Date cannot be in the future.")
+
         return data
 
 
@@ -45,7 +52,9 @@ class ApartmentSerializer(serializers.ModelSerializer):
 
     def get_rooms(self, obj):
         rooms_queryset = obj.rooms.all()
-        return RoomSerializer(rooms_queryset, many=True).data
+        context = self.context.copy()
+        context["nested"] = True
+        return RoomSerializer(rooms_queryset, many=True, context=context).data
 
     def get_bill_ids(self, obj):
         bills = obj.bills.all()
@@ -66,9 +75,33 @@ class RoomImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image"]
 
 
+class ContractSerializer(serializers.ModelSerializer):
+    room_id = serializers.IntegerField(source="room.id", read_only=True)
+    apartment_id = serializers.IntegerField(source="room.apartment.id", read_only=True)
+
+    class Meta:
+        model = Contract
+        fields = [
+            "id",
+            "room_id",
+            "apartment_id",
+            "start_date",
+            "end_date",
+            "deposit_amount",
+            "rent_amount",
+        ]
+
+
 class RoomSerializer(serializers.ModelSerializer):
     images = RoomImageSerializer(many=True, read_only=True)
     apartment_id = serializers.IntegerField(write_only=True, required=True)
+    contract = ContractSerializer(read_only=True)  # Add this line
+    apartment = ApartmentSerializer(read_only=True)  # Add this line
+
+    def to_representation(self, instance):
+        if self.context.get("nested"):
+            self.fields.pop("apartment", None)
+        return super().to_representation(instance)
 
     class Meta:
         model = Room
@@ -82,6 +115,7 @@ class RoomSerializer(serializers.ModelSerializer):
             "apartment_id",
             "contract",
             "renter",
+            "apartment",
         ]
 
     def create(self, validated_data):
@@ -130,20 +164,3 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
-
-
-class ContractSerializer(serializers.ModelSerializer):
-    room_id = serializers.IntegerField(source="room.id", read_only=True)
-    apartment_id = serializers.IntegerField(source="room.apartment.id", read_only=True)
-
-    class Meta:
-        model = Contract
-        fields = [
-            "id",
-            "room_id",
-            "apartment_id",
-            "start_date",
-            "end_date",
-            "deposit_amount",
-            "rent_amount",
-        ]

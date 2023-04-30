@@ -1,17 +1,36 @@
 import { useEffect, useState } from 'react';
-import { Room } from '../../types';
+import { Room, CustomUser } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { useParams } from 'react-router-dom';
-import { Box, Heading, VStack, Text } from '@chakra-ui/react';
+import { useParams, Link } from 'react-router-dom';
+import { Box, Heading, VStack, Text, Button, HStack } from '@chakra-ui/react';
+import UpdateRoomForm from './UpdateRoomForm';
+import DeleteRoom from './DeleteRoom';
+import { useNavigate } from 'react-router-dom';
 
-const SingleRoom: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+const OwnerSingleRoom: React.FC = () => {
+  const { id = '' } = useParams<{ id: string }>();
   const [room, setRoom] = useState<Room | null>(null);
+  const [renter, setRenter] = useState<CustomUser | null>(null);
   const [roomData, status] = useAuthorizedData<Room>(`/owner/owner-apartments/${id}/room/${id}/`);
+  
+  
+  const navigate = useNavigate();
+
+  const handleRoomDelete = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
     if (status === 'idle' && roomData) {
       setRoom(roomData);
+
+      if (roomData.renter) {
+        // Make a new request to fetch the renter object
+        fetch(`/renters/${roomData.renter}`)
+          .then(response => response.json())
+          .then(renterData => setRenter(renterData))
+          .catch(error => console.log(error));
+      }
     }
   }, [roomData, status]);
 
@@ -22,6 +41,7 @@ const SingleRoom: React.FC = () => {
   if (status === 'error' || !room) {
     return <div>Error loading room data.</div>;
   }
+  console.log("room object:", room);
 
   return (
     <Box>
@@ -41,10 +61,37 @@ const SingleRoom: React.FC = () => {
         <Text>
           <strong>Has window:</strong> {room.window ? 'Yes' : 'No'}
         </Text>
+        {room.contract ? (
+          <Box>
+            <Text>
+              <strong>Contract ID:</strong> {room.contract.id}
+            </Text>
+            <Link   to={`/owner/owner-apartments/${room.apartment.id}/room/${room.id}/contracts/${room.contract.id}`}>
+              <Button colorScheme="blue">Room Contract</Button>
+            </Link>
+          </Box>
+        ) : (
+          <Text>No contract available for this room.</Text>
+        )}
+        {renter ? (
+          <Box>
+            <Text>
+              <strong>Renter ID:</strong> {renter.id}
+            </Text>
+            <Text>
+              <strong>Renter name:</strong> {renter.first_name} {renter.last_name}
+            </Text>
+          </Box>
+        ) : (
+          <Text>No renter assigned to this room.</Text>
+        )}
       </VStack>
+      <HStack spacing={4} mt={6}>
+        <UpdateRoomForm room={room} onUpdate={(updatedRoom: Room) => setRoom(updatedRoom)} />
+        <DeleteRoom roomId={id} onDelete={handleRoomDelete} />
+      </HStack>
     </Box>
   );
 };
 
-export default SingleRoom;
-
+export default OwnerSingleRoom;

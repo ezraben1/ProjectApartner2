@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 router.register("owner-apartments", ApartmentViewSet, basename="apartments")
 router.register("owner-rooms", views.OwnerRoomViewSet, basename="rooms")
 router.register("owner-contarcts", ContractViewSet, basename="contracts")
+router.register("owner-bills", BillViewSet, basename="bills")
 
 
 urlpatterns = [

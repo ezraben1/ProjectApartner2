@@ -70,11 +70,20 @@ export interface CustomUser {
     amount: number;
     date: string; // Date string
     paid: boolean;
-    created_by: CustomUser;
     created_at: string; // Date string
     updated_at: string; // Date string
     document: string | null; // URL of the file
     files: BillFile[];
+  }
+
+  export namespace Bill {
+    export const BILL_TYPES: [Bill['bill_type'], string][] = [
+      ['electricity', 'Electricity'],
+      ['gas', 'Gas'],
+      ['water', 'Water'],
+      ['rent', 'Rent'],
+      ['other', 'Other'],
+    ];
   }
   
   export interface BillFile {

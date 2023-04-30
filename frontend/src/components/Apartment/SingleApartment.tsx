@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Apartment, Room } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { ListGroup, Button } from 'react-bootstrap';
+import { List, ListItem, Button, Heading, Text, Flex, Box, VStack } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
 import UpdateApartmentForm from './UpdateApartmentForm';
 import DeleteApartment from './DeleteApartment';
@@ -11,7 +11,6 @@ const SingleApartment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [apartment, setApartment] = useState<Apartment | null>(null);
   const [apartmentData, status] = useAuthorizedData<Apartment>(`/owner/owner-apartments/${id}/`);
-
 
   useEffect(() => {
     if (status === 'idle' && apartmentData) {
@@ -32,28 +31,49 @@ const SingleApartment: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>{apartment.address}</h1>
-      <p>{apartment.description}</p>
-      <UpdateApartmentForm apartment={apartment} onUpdate={updateApartment} />
-      <DeleteApartment apartmentId={id} />
-
-      <ListGroup variant="flush">
-        {apartment.rooms.map((room: Room) => (
-          <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
-            <ListGroup.Item>
-              <h3>{room.description}</h3>
-              <p className="mb-0">Price per month: {room.price_per_month}</p>
-              <p className="mb-0">Size: {room.size}</p>
-            </ListGroup.Item>
-          </Link>
-        ))}
-      </ListGroup>
-
-      <div className="mt-4">
-      <AddRoomForm apartmentId={apartment.id} />
-      </div>
-    </div>
+    <Box maxW="800px" mx="auto" p="6" bg="white" borderRadius="lg" boxShadow="md">
+      <VStack align="stretch" spacing={6}>
+        <Flex justify="space-between" align="center">
+          <Heading>{apartment.address}</Heading>
+          <Flex>
+            <UpdateApartmentForm apartment={apartment} onUpdate={updateApartment} />
+            <DeleteApartment apartmentId={id} />
+          </Flex>
+        </Flex>
+        <Text>{apartment.description}</Text>
+        <List spacing={3}>
+          {apartment.rooms.map((room: Room) => (
+            <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
+              <ListItem
+                p="4"
+                rounded="md"
+                bg="gray.50"
+                boxShadow="md"
+                transition="background 0.2s"
+                _hover={{
+                  bg: 'gray.100',
+                }}
+              >
+                <Heading size="md">{room.description}</Heading>
+                <Text>Price per month: {room.price_per_month}</Text>
+                <Text>Size: {room.size}</Text>
+              </ListItem>
+            </Link>
+          ))}
+        </List>
+        <Flex justify="space-between" align="center">
+          <AddRoomForm apartmentId={apartment.id} />
+          <Flex>
+            <Link to={`/owner/my-apartments/${apartment.id}/contracts`}>
+              <Button colorScheme="green">View Contracts</Button>
+            </Link>
+            <Link to={`/owner/my-apartments/${apartment.id}/bills`}>
+              <Button colorScheme="blue" ml={2}>View Bills</Button>
+            </Link>
+          </Flex>
+        </Flex>
+      </VStack>
+    </Box>
   );
 };
 

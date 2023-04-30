@@ -44,7 +44,7 @@ const HomePage: React.FC<HomeProps> = ({ }) => {
               <AspectRatio ratio={4 / 3}>
                 <Card.Img
                   variant="top"
-                  src={room.images[0] ? room.images[0].url : 'https://via.placeholder.com/150'}
+                  src={room.images && room.images[0] ? room.images[0].url : 'https://via.placeholder.com/150'}
                   style={{ objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
                 />
               </AspectRatio>
