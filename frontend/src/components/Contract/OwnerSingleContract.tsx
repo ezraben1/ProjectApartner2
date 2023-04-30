@@ -14,7 +14,8 @@ const OwnerSingleContract: React.FC = () => {
     }>();
     const [contract, setContract] = useState<Contract | null>(null);
     const [status, setStatus] = useState<'loading' | 'error' | 'success'>('loading');
-  
+    console.log('apartmentId:', apartmentId, 'roomId:', roomId, 'contractId:', contractId);
+
     const fetchContract = async () => {
         try {
           const response = await api.get(`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/`);
@@ -71,10 +72,18 @@ const OwnerSingleContract: React.FC = () => {
           </Text>
         </VStack>
         <HStack spacing={4} mt={6}>
-          <UpdateContractForm
+        <UpdateContractForm
+        contract={contract}
+        onUpdate={(updatedContract: Contract) => setContract(updatedContract)}
+        apartmentId={apartmentId}
+        roomId={roomId}
+          />
+          <DeleteContract
             contract={contract}
-            onUpdate={(updatedContract: Contract) => setContract(updatedContract)} apartmentId={''} roomId={''}          />
-          <DeleteContract contract={contract} onDelete={handleContractDelete} />
+            onDelete={handleContractDelete}
+            apartmentId={apartmentId}
+            roomId={roomId}
+          />
         </HStack>
       </Box>
     );

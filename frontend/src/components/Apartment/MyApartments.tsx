@@ -43,7 +43,7 @@ const MyApartments: React.FC = () => {
 
       <List spacing={4}>
         {apartments.map((apartment: Apartment) => (
-          <Link key={apartment.id} to={`/owner/my-apartments/${apartment.id}`}>
+          <Link to={`/owner/my-apartments/${apartment.id}`}>
             <ListItem
               p="4"
               rounded="md"
@@ -81,10 +81,12 @@ const MyApartments: React.FC = () => {
                   ))}
                 </List>
                 <Flex justify="space-between" align="center">
-                  <Button as={Link} to={`/owner/my-apartments/${apartment.id}/contracts`} colorScheme="blue">View Contracts</Button>
-                  <Link to={`/owner/my-apartments/${apartment.id}/add-bill`}>
-                    <Button colorScheme="green">Add Bill</Button>
-                  </Link>
+                <Button as={Link} to={`/owner/my-apartments/${apartment.id}/contracts?apartmentId=${apartment.id}`} colorScheme="blue">
+                View Contracts
+                </Button>                  
+                <Link to={`/owner/my-apartments/${apartment.id}/bills`}>
+                <Button colorScheme="green" ml={2}>View Bills</Button>
+                </Link>
                 </Flex>
               </VStack>
             </ListItem>

@@ -128,7 +128,7 @@ const NavLinks = () => (
         <MenuItem as={RouterLink} to="/owner/my-rooms">
           My Rooms
         </MenuItem>
-        <MenuItem as={RouterLink} to="/owner/contracts">
+        <MenuItem as={RouterLink} to="/owner/my-contracts">
           My Contracts
         </MenuItem>
       </MenuList>

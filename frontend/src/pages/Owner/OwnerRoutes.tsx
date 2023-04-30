@@ -24,7 +24,7 @@ const OwnerRoutes = () => {
       <Route path="/owner/my-apartments/:id/room/:id" element={<OwnerSingleRoom />} />
       <Route path="/owner/my-apartments/:apartmentId/bills/" element={<BillsList/>} />
       <Route path="/owner/my-apartments/:apartmentId/bills/:billId" element={<SingleBill />} />
-      <Route path="/owner/owner-apartments/:apartmentId/room/:roomId/contracts/:contractId/" element={<OwnerSingleContract />} />
+      <Route path="/owner/my-apartments/:apartmentId/room/:roomId/contracts/:contractId/" element={<OwnerSingleContract />} />
 
       {/* 
       <Route path="/owner/apartments/:apartmentId/contracts/:contractId" element={<OwnerContractDetail />} />

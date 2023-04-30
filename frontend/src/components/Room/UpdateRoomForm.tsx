@@ -21,11 +21,14 @@ import api from '../../utils/api';
 interface UpdateRoomFormProps {
   room: Room;
   onUpdate: (updatedRoom: Room) => void;
+  apartmentId: number;
+
 }
 
-const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room, onUpdate }) => {
+const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room,apartmentId, onUpdate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updatedRoom, setUpdatedRoom] = useState<Room>(room);
+
   const toast = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,8 +44,11 @@ const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room, onUpdate }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-        const response = await api.patch(`/owner/owner-rooms/${room.id}/`, updatedRoom);
-        const data = await response.json();
+      const response = await api.patch(`/owner/owner-apartments/${apartmentId}/room/${room.id}/`, {
+        ...updatedRoom,
+        apartment_id: apartmentId,
+      });
+      const data = await response.json();
       onUpdate(data);
       toast({
         title: 'Room updated.',
@@ -63,6 +69,8 @@ const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room, onUpdate }) => {
     }
     onClose();
   };
+  
+  
 
   return (
     <>

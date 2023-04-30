@@ -54,6 +54,8 @@ export interface CustomUser {
   
   export interface Contract {
     id: number;
+    room_id: number; // Add this line
+    apartment_id: number; // Add this line
     room: Room;
     owner: CustomUser;
     start_date: string; // Date string
@@ -62,6 +64,7 @@ export interface CustomUser {
     deposit_amount: number;
     terms_and_conditions: string | null;
   }
+  
   
   export interface Bill {
     id: number;

@@ -15,21 +15,27 @@ import api from '../../utils/api';
 
 interface DeleteContractProps {
   contract: Contract;
-  onDelete: () => void;
+  apartmentId?: string;
+  roomId?: string;
+  onDelete: (deletedContract: Contract) => void; 
 }
 
-const DeleteContract: React.FC<DeleteContractProps> = ({ contract, onDelete }) => {
+const DeleteContract: React.FC<DeleteContractProps> = ({ contract, onDelete, apartmentId, roomId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef<HTMLButtonElement>(null);
 
   const handleDelete = async () => {
+    if (!apartmentId || !roomId) {
+      console.error('Apartment ID or Room ID is not defined');
+      return;
+    }
+
     try {
       const response = await api.remove(
-        `/owner/owner-apartments/${contract.room.apartment}/room/${contract.room}/contracts/${contract.id}/`
+        `/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contract.id}/`
       );
-
       if (response.status === 204) {
-        onDelete();
+        onDelete(contract);
         onClose();
       } else {
         throw new Error('Error deleting contract');

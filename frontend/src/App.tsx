@@ -20,6 +20,7 @@ import BillsList from './components/Bill/BillsList';
 import SingleBill from './components/Bill/SingleBill';
 import OwnerSingleContract from './components/Contract/OwnerSingleContract';
 import OwnerSingleRoom from './components/Room/OwnerSingleRoom';
+import ApartmentContracts from './components/Contract/ApartmentContracts';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -44,7 +45,9 @@ function App() {
             <Route path="/owner/my-apartments" element={<MyApartments />} />
             <Route path="/owner/my-apartments/:id" element={<SingleApartment />} />
             <Route path="/owner/my-apartments/:id/room/:id" element={<OwnerSingleRoom />} />
-            <Route path="/owner/owner-apartments/:apartmentId/room/:roomId/contracts/:contractId/" element={<OwnerSingleContract />} />
+            <Route path="/owner/my-apartments/:id/contracts/" element={<ApartmentContracts />} />
+
+            <Route path="/owner/my-apartments/:apartmentId/room/:roomId/contracts/:contractId" element={<OwnerSingleContract />} />
 
             <Route path="/owner/my-apartments/:apartmentId/bills/" element={<BillsList/>} />
             <Route path="/owner/my-apartments/:apartmentId/bills/:billId" element={<SingleBill />} />
@@ -52,6 +55,8 @@ function App() {
             <Route path="/owner/my-rooms/:id" element={<SingleRoom />} />
             <Route path="/owner/my-contracts" element={<MyContracts />} />
             <Route path="/owner/contracts/:id" element={<SingleContract />} />
+
+
 
             <Route path="/test" element={<MinimalExample />} />
           </Routes>

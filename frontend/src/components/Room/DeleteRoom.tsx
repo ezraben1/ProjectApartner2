@@ -13,18 +13,19 @@ import {
 import api from '../../utils/api';
 
 interface DeleteRoomProps {
-  roomId: string;
+  roomId: number;
+  apartmentId: number;
   onDelete: () => void;
 }
 
-const DeleteRoom: React.FC<DeleteRoomProps> = ({ roomId, onDelete }) => {
+const DeleteRoom: React.FC<DeleteRoomProps> = ({ roomId, apartmentId, onDelete }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
   const handleDelete = async () => {
     try {
-      await api.remove(`/owner/owner-rooms/${roomId}`);
+      await api.remove(`/owner/owner-apartments/${apartmentId}/room/${roomId}`);
       onDelete();
       toast({
         title: 'Room deleted.',

@@ -14,6 +14,32 @@ router.register("owner-bills", BillViewSet, basename="bills")
 
 urlpatterns = [
     path(
+        "owner-apartments/<int:apartment_id>/rooms/",
+        views.OwnerRoomViewSet.as_view(
+            {
+                "get": "list",
+                "put": "update",
+                "delete": "destroy",
+                "post": "create",
+                "patch": "partial_update",
+            }
+        ),
+        name="rooms",
+    ),
+    path(
+        "owner-apartments/<int:apartment_id>/rooms/",
+        views.OwnerRoomViewSet.as_view(
+            {
+                "get": "list",
+                "put": "update",
+                "delete": "destroy",
+                "post": "create",
+                "patch": "partial_update",
+            }
+        ),
+        name="owner-room-detail",
+    ),
+    path(
         "owner-apartments/<int:apartment_id>/room/<int:pk>/",
         RoomViewSet.as_view(
             {
@@ -21,6 +47,7 @@ urlpatterns = [
                 "put": "update",
                 "delete": "destroy",
                 "post": "create_contract",
+                "patch": "partial_update",
             }
         ),
         name="room-detail",
@@ -37,6 +64,16 @@ urlpatterns = [
             }
         ),
         name="contract_detail",
+    ),
+    path(
+        "owner-apartments/<int:apartment_id>/room/<int:room_id>/contracts/",
+        ContractViewSet.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+        name="contracts",
     ),
     path(
         "owner-apartments/<int:apartment_id>/room/<int:room_id>/contracts/<int:pk>/",

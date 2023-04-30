@@ -77,7 +77,9 @@ class RoomImageSerializer(serializers.ModelSerializer):
 
 class ContractSerializer(serializers.ModelSerializer):
     room_id = serializers.IntegerField(source="room.id", read_only=True)
-    apartment_id = serializers.IntegerField(source="room.apartment.id", read_only=True)
+    apartment_id = serializers.PrimaryKeyRelatedField(
+        source="room.apartment.id", read_only=True
+    )
 
     class Meta:
         model = Contract
@@ -94,9 +96,10 @@ class ContractSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
     images = RoomImageSerializer(many=True, read_only=True)
-    apartment_id = serializers.IntegerField(write_only=True, required=True)
-    contract = ContractSerializer(read_only=True)  # Add this line
-    apartment = ApartmentSerializer(read_only=True)  # Add this line
+    apartment = serializers.PrimaryKeyRelatedField(
+        queryset=Apartment.objects.all(), write_only=True
+    )
+    contract = ContractSerializer(read_only=True)
 
     def to_representation(self, instance):
         if self.context.get("nested"):
@@ -119,8 +122,7 @@ class RoomSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        apartment_id = validated_data.pop("apartment_id")
-        apartment = get_object_or_404(Apartment, id=apartment_id)
+        apartment = validated_data.pop("apartment")
         room = Room.objects.create(apartment=apartment, **validated_data)
         return room
 

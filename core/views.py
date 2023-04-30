@@ -139,6 +139,15 @@ class RoomViewSet(ModelViewSet):
             permission_classes = [IsAuthenticated, IsApartmentOwner]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            if user.user_type == "owner":
+                return Room.objects.filter(apartment__owner=self.request.user)
+            elif user.user_type == "searcher":
+                return Room.objects.prefetch_related("images").all()
+        return Room.objects.prefetch_related("images").filter(is_available=True)
+
     @action(
         detail=True,
         url_path="contracts",
@@ -201,15 +210,6 @@ class RoomViewSet(ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            if user.user_type == "owner":
-                return Room.objects.filter(apartment__owner=self.request.user)
-            elif user.user_type == "searcher":
-                return Room.objects.prefetch_related("images").all()
-        return Room.objects.prefetch_related("images").filter(is_available=True)
-
 
 class RoomImageViewSet(ModelViewSet):
     serializer_class = serializers.RoomImageSerializer
@@ -255,8 +255,11 @@ class ContractViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated and user.user_type == "owner":
+            # Filter apartments by owner
             apartments = Apartment.objects.filter(owner=user)
+            # Filter rooms by apartments
             rooms = Room.objects.filter(apartment__in=apartments)
+            # Filter contracts by rooms
             contracts = Contract.objects.filter(room__in=rooms)
             return contracts
         else:
@@ -268,16 +271,22 @@ class ContractViewSet(ModelViewSet):
                 {"error": "Only owners can create Contracts."},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        room_id = self.kwargs["room_id"]
+        room = get_object_or_404(Room, id=room_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        contract = self.perform_create(serializer)
+        room.contract = contract
+        room.save()
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        room_id = self.kwargs["room_id"]
+        room = get_object_or_404(Room, id=room_id)
+        return serializer.save(owner=self.request.user, room=room)
 
 
 class BillViewSet(ModelViewSet):

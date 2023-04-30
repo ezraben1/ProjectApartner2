@@ -1,38 +1,56 @@
 import { useEffect, useState } from 'react';
-import { Room, CustomUser } from '../../types';
-import { useAuthorizedData } from '../../utils/useAuthorizedData';
+import { Room, CustomUser, Contract } from '../../types';
 import { useParams, Link } from 'react-router-dom';
 import { Box, Heading, VStack, Text, Button, HStack } from '@chakra-ui/react';
 import UpdateRoomForm from './UpdateRoomForm';
 import DeleteRoom from './DeleteRoom';
 import { useNavigate } from 'react-router-dom';
+import AddContract from '../Contract/AddContract';
+import api from '../../utils/api';
 
 const OwnerSingleRoom: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();
   const [room, setRoom] = useState<Room | null>(null);
   const [renter, setRenter] = useState<CustomUser | null>(null);
-  const [roomData, status] = useAuthorizedData<Room>(`/owner/owner-apartments/${id}/room/${id}/`);
-  
-  
+  const [apartmentId, setApartmentId] = useState<number>(0);
+  const [, setLoading] = useState<boolean>(true);
+
   const navigate = useNavigate();
 
   const handleRoomDelete = () => {
     navigate(-1);
   };
 
-  useEffect(() => {
-    if (status === 'idle' && roomData) {
-      setRoom(roomData);
-
-      if (roomData.renter) {
-        // Make a new request to fetch the renter object
-        fetch(`/renters/${roomData.renter}`)
-          .then(response => response.json())
-          .then(renterData => setRenter(renterData))
-          .catch(error => console.log(error));
+  const handleContractCreate = (createdContract: Contract) => {
+    setRoom((prevRoom) => {
+      if (prevRoom) {
+        return { ...prevRoom, contract: createdContract };
       }
-    }
-  }, [roomData, status]);
+      return prevRoom;
+    });
+  };
+
+  useEffect(() => {
+    const fetchApartmentAndRoomIds = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/owner/owner-apartments/${id}/room/${id}/`);
+        const roomData = await response.json();
+        
+        setRoom(roomData);
+        setApartmentId(roomData.apartment_id);
+      } catch (error) {
+        console.error('Error fetching apartment and room IDs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchApartmentAndRoomIds();
+  }, [id]);
+  
+  
+  
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -41,9 +59,9 @@ const OwnerSingleRoom: React.FC = () => {
   if (status === 'error' || !room) {
     return <div>Error loading room data.</div>;
   }
-  console.log("room object:", room);
 
   return (
+    
     <Box>
       <Heading as="h1" size="xl" textAlign="center" my={8}>
         Room #{room.id}
@@ -66,7 +84,8 @@ const OwnerSingleRoom: React.FC = () => {
             <Text>
               <strong>Contract ID:</strong> {room.contract.id}
             </Text>
-            <Link   to={`/owner/owner-apartments/${room.apartment.id}/room/${room.id}/contracts/${room.contract.id}`}>
+            
+            <Link   to={`/owner/my-apartments/${apartmentId}/room/${room.id}/contracts/${room.contract.id}`}>
               <Button colorScheme="blue">Room Contract</Button>
             </Link>
           </Box>
@@ -87,8 +106,10 @@ const OwnerSingleRoom: React.FC = () => {
         )}
       </VStack>
       <HStack spacing={4} mt={6}>
-        <UpdateRoomForm room={room} onUpdate={(updatedRoom: Room) => setRoom(updatedRoom)} />
-        <DeleteRoom roomId={id} onDelete={handleRoomDelete} />
+      <UpdateRoomForm room={room} apartmentId={apartmentId} onUpdate={(updatedRoom: Room) => setRoom(updatedRoom)} />
+        <DeleteRoom roomId={room.id} apartmentId={apartmentId} onDelete={handleRoomDelete} />
+        <AddContract roomId={room.id} apartmentId={apartmentId} onCreate={handleContractCreate} />
+
       </HStack>
     </Box>
   );

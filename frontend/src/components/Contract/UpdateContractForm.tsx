@@ -19,9 +19,10 @@ import api from '../../utils/api';
 interface UpdateContractFormProps {
   contract: Contract;
   onUpdate: (updatedContract: Contract) => void;
-  apartmentId: string;
-  roomId: string;
+  apartmentId?: string;
+  roomId?: string;
 }
+
 const UpdateContractForm: React.FC<UpdateContractFormProps> = ({ contract, onUpdate, apartmentId, roomId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updatedContract, setUpdatedContract] = useState<Contract>(contract);
@@ -33,11 +34,13 @@ const UpdateContractForm: React.FC<UpdateContractFormProps> = ({ contract, onUpd
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!apartmentId || !roomId) {
+      console.error('Apartment ID or Room ID is not defined');
+      return;
+    }
+  
     try {
-      const response = await api.patch(
-        `/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contract.id}/`,
-        updatedContract
-      );
+      const response = await api.patch(`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contract.id}/`, updatedContract);
 
       if (response.status === 200) {
         const updatedData = await response.json();

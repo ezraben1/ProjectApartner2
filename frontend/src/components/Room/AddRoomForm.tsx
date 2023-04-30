@@ -4,58 +4,56 @@ import api from '../../utils/api';
 import { AxiosError } from 'axios';
 
 interface RoomFormData {
-    description: string;
-    size: string;
-    price_per_month: number | null;
-    window: boolean;
-    apartment_id: number | null;
-  }
-  
-  interface AddRoomFormProps {
-    apartmentId: number;
-  }
-  
-  const AddRoomForm: React.FC<AddRoomFormProps> = ({ apartmentId }) => {
-    const [formData, setFormData] = useState<RoomFormData>({
-      description: '',
-      size: '',
-      price_per_month: null,
-      window: false,
-      apartment_id: apartmentId,
-    });
+  description: string;
+  size: string;
+  price_per_month: number | null;
+  window: boolean;
+  apartment: number | null;
+}
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-      
-        try {
-            console.log('formData:', formData);
-            const response = await api.post(`/owner/owner-rooms/`, formData);
-          if (response.status === 201) {
-            setFormData({
-              description: '',
-              size: '',
-              price_per_month: null,
-              window: false,
-              apartment_id: apartmentId, // Add this line
-            });
-      
-            alert('Room added successfully!');
-          } else {
-            const errorData = await response.json();
-            console.error('Error adding room:', errorData);
-            alert(`Failed to add room: ${JSON.stringify(errorData)}`);
-          }
-        } catch (error) {
-            const axiosError = error as AxiosError;
-            if (axiosError.response) {
-              console.error('Server error message:', axiosError.response.data);
-            }
-            console.error('Error adding room:', error);
-            alert('Failed to add room.');
-          }
-          
-      };
-      
+interface AddRoomFormProps {
+  apartmentId: number;
+}
+
+const AddRoomForm: React.FC<AddRoomFormProps> = ({ apartmentId }) => {
+  const [formData, setFormData] = useState<RoomFormData>({
+    description: '',
+    size: '',
+    price_per_month: null,
+    window: false,
+    apartment: apartmentId,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      console.log('formData:', formData);
+      const response = await api.post(`/owner/owner-apartments/${apartmentId}/rooms/`, formData);
+      if (response.status === 201) {
+        setFormData({
+          description: '',
+          size: '',
+          price_per_month: null,
+          window: false,
+          apartment: apartmentId, // Updated this line
+        });
+
+        alert('Room added successfully!');
+      } else {
+        const errorData = await response.json();
+        console.error('Error adding room:', errorData);
+        alert(`Failed to add room: ${JSON.stringify(errorData)}`);
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        console.error('Server error message:', axiosError.response.data);
+      }
+      console.error('Error adding room:', error);
+      alert('Failed to add room.');
+    }
+  };
 
   return (
     <Form onSubmit={handleSubmit}>
