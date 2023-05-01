@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Apartment, Room } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, Stack } from '@chakra-ui/react';
+import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, Stack, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
 import UpdateApartmentForm from './UpdateApartmentForm';
 import DeleteApartment from './DeleteApartment';
 import AddRoomForm from '../Room/AddRoomForm';
 import api from '../../utils/api';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import ApartmentThumbnail from '../images/ApartmentThumbnail';
 
 const SingleApartment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -121,10 +122,14 @@ const SingleApartment: React.FC = () => {
 
 
   return (
+    
     <Box maxW="800px" mx="auto" p="6" bg="white" borderRadius="lg" boxShadow="md">
+      <Flex justify="center" align="center">
+      <Heading>{apartment.address}</Heading>
+      </Flex>
       <VStack align="stretch" spacing={6}>
         <Flex justify="center" align="center" >
-        <Flex align="center" justify="center">
+        <Flex align="center" justify="center" mt={4}>
           {imageItems && imageItems.length > 0 && (
             <>
               <IconButton
@@ -135,7 +140,7 @@ const SingleApartment: React.FC = () => {
                 colorScheme="gray"
                 variant="outline"
               />
-              <Box boxSize="300px" borderRadius="sm" overflow="hidden" >
+              <Box objectFit='cover'  boxSize="md" borderRadius="fill" overflow="hidden" >
                 <Image
                   src={imageItems[selectedImageIndex].original}
                   alt={imageItems[selectedImageIndex].original}
@@ -153,7 +158,6 @@ const SingleApartment: React.FC = () => {
             </>
           )}
         </Flex>
-            <Heading>{apartment.address}</Heading>
           </Flex>
           <Flex>
           <UpdateApartmentForm apartment={apartment} onUpdate={updateApartment} />
@@ -163,11 +167,7 @@ const SingleApartment: React.FC = () => {
         </Flex>
         <Text fontSize="lg" color="gray.600">{apartment.description}</Text>
 
-        {/* Add image upload input */}
-        <Stack direction="column" spacing={3}>
-          <Text fontWeight="bold">Upload Images:</Text>
-          <Input type="file" accept="image/*" onChange={handleImageChange} />
-        </Stack>
+      
 
         {/* Add image gallery using react-image-gallery */}
 
@@ -186,7 +186,9 @@ const SingleApartment: React.FC = () => {
                     bg: 'gray.100',
                   }}
                   >
-                    <Heading size="md">{room.description}</Heading>
+                    <Heading as="h1" size="xl" textAlign="center" my={8}>
+                      Room #{room.id} <ApartmentThumbnail src={room.images?.[0]?.image || ''} />
+                    </Heading>
                     <Text fontWeight="bold">Price per month:</Text>
                     <Text>{room.price_per_month}</Text>
                     <Text fontWeight="bold">Size:</Text>
@@ -209,6 +211,15 @@ const SingleApartment: React.FC = () => {
             </Flex>
           </Flex>
         </VStack>
+        <Flex direction="column" alignItems="flex-start">
+              <Text fontSize="lg" fontWeight="bold" mb={2}>Upload Images:</Text>
+              <InputGroup>
+            <Input type="file" accept="image/*" onChange={handleImageChange} />
+                <InputRightElement>
+                  <IconButton aria-label="Upload" icon={<AddIcon />} />
+                </InputRightElement>
+              </InputGroup>
+            </Flex>
       </Box>
     );
   };

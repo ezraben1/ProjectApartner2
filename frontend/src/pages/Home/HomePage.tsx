@@ -4,6 +4,7 @@ import { Card } from 'react-bootstrap';
 import { Room } from '../../types';
 import api from '../../utils/api';
 import { Link } from 'react-router-dom';
+import RoomThumbnail from '../../components/images/RoomThumbnail';
 
 interface HomeProps {
   currentUser: any;
@@ -42,11 +43,7 @@ const HomePage: React.FC<HomeProps> = ({ }) => {
           <Link to={`/home/${room.id}`} key={room.id} style={{ textDecoration: 'none' }}>
             <Card className="h-100 shadow-sm" style={{ width: '18rem', borderRadius: '12px' }}>
               <AspectRatio ratio={4 / 3}>
-                <Card.Img
-                  variant="top"
-                  src={room.images && room.images[0] ? room.images[0].url : 'https://via.placeholder.com/150'}
-                  style={{ objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
-                />
+              <RoomThumbnail src={room.images[0]?.image || ''} />
               </AspectRatio>
               <Card.Body>
                 <Card.Title>{room.apartment?.address || 'No address available'}</Card.Title>

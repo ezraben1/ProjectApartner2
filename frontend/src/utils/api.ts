@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import Cookies from 'js-cookie';
 
+export const API_BASE_URL = 'http://localhost:8000';
+
 const api: AxiosInstance = axios.create({
   baseURL: 'http://localhost:8000',
   headers: {
@@ -129,12 +131,24 @@ const put = async (url: string, data: any): Promise<Response> => {
   });
 };
 
+const getBlob = async (url: string, options?: any): Promise<Blob> => {
+  const response = await api.get(url, { ...options, responseType: 'blob' });
+
+  if (response.status !== 200) {
+    throw new Error(`Error downloading file: ${response.statusText}`);
+  }
+
+  return response.data;
+};
+
+
 export default {
   post,
   get,
   getUserDetails,
   patch,
   remove,
-  put
+  put,
+  getBlob
 };
 

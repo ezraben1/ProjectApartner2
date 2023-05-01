@@ -54,7 +54,6 @@ class OwnerApartmentViewSet(ApartmentViewSet):
 
 
 class OwnerRoomViewSet(RoomViewSet):
-    lookup_field = "apartment_id"
     parser_classes = (MultiPartParser,)
 
     def get_queryset(self):
@@ -63,6 +62,21 @@ class OwnerRoomViewSet(RoomViewSet):
             return Room.objects.filter(apartment__owner=self.request.user)
         else:
             return Room.objects.none()
+
+    @action(
+        detail=True, methods=["patch"], parser_classes=[FormParser, MultiPartParser]
+    )
+    def upload_image(self, request, pk=None):
+        room = self.get_object()
+        serializer = serializers.RoomImageSerializer(
+            data=request.data, context={"room_id": room.id}
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         apartment_id = self.kwargs.get("apartment_id")

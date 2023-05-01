@@ -98,6 +98,7 @@ class Contract(models.Model):
         max_digits=8, decimal_places=2, validators=[MinValueValidator(1)]
     )
     terms_and_conditions = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to="contracts/", blank=True, null=True)
 
 
 class Room(models.Model):
@@ -148,10 +149,6 @@ class RoomImage(models.Model):
     )
 
 
-class BillFile(models.Model):
-    file = models.FileField(upload_to="bill_files/")
-
-
 class Bill(models.Model):
     ELECTRICITY = "electricity"
     GAS = "gas"
@@ -181,13 +178,7 @@ class Bill(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    bill_file = models.ForeignKey(
-        BillFile,
-        on_delete=models.CASCADE,
-        related_name="bill",
-        null=True,
-        blank=True,
-    )
+    file = models.FileField(upload_to="bill_files/", null=True, blank=True)
 
     class Meta:
         ordering = ["-date"]

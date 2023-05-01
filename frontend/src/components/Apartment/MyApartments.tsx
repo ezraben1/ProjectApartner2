@@ -5,14 +5,15 @@ import { useUserType } from '../../utils/useUserType';
 import { VStack, Button, Heading, Text, Box, List, ListItem, Flex, Image } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import AddApartmentForm from './AddApartmentForm';
+import RoomThumbnail from '../images/RoomThumbnail';
 
 const ApartmentThumbnail: React.FC<{ src: string }> = ({ src }) => {
   return (
     <Image
       src={src}
       alt="Apartment thumbnail"
-      width="100px"
-      height="100px"
+      width="150px"
+      height="150px"
       objectFit="cover"
       borderRadius="md"
     />
@@ -71,7 +72,7 @@ const MyApartments: React.FC = () => {
                 <Flex justify="space-between" align="center">
                   <Heading size="md">{apartment.address}</Heading>
                   <Text fontSize="lg" color="red.500">{apartment.address}</Text>
-                  <ApartmentThumbnail src={apartment.images[0]?.url || ''} />
+                  <ApartmentThumbnail src={apartment.images?.[0]?.image || ''} />
 
                 </Flex>
                 <Text>{apartment.description}</Text>
@@ -79,19 +80,24 @@ const MyApartments: React.FC = () => {
                 {apartment.rooms?.map((room: Room) => (
                     <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
                       <ListItem
-                        p="4"
-                        rounded="md"
-                        bg="gray.100"
-                        boxShadow="md"
-                        transition="background 0.2s"
-                        _hover={{
-                          bg: 'gray.200',
-                        }}
-                      >
-                        <Heading size="sm">{room.description}</Heading>
-                        <Text>Price per month: {room.price_per_month}</Text>
-                        <Text>Size: {room.size}</Text>
-                      </ListItem>
+                          p="4"
+                          rounded="md"
+                          bg="gray.100"
+                          boxShadow="md"
+                          transition="background 0.2s"
+                          _hover={{
+                            bg: 'gray.200',
+                          }}
+                        >
+                          <Flex align="center">
+                            <RoomThumbnail src={room.images[0]?.image || ''} />
+                            <VStack align="start" spacing={2} marginLeft="16px">
+                              <Heading size="sm">{room.description}</Heading>
+                              <Text>Price per month: {room.price_per_month}</Text>
+                              <Text>Size: {room.size}</Text>
+                            </VStack>
+                          </Flex>
+                        </ListItem>
                     </Link>
                   ))}
                 </List>

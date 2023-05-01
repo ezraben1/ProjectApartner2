@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.db.models.aggregates import Count
-from django.utils.html import format_html, urlencode
+from django.utils.html import format_html
 from django.urls import reverse
 from . import models
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
-from .models import Bill, BillFile
+from .models import Bill
 
 
 @admin.register(models.Room)
@@ -114,13 +114,7 @@ class BillAdmin(admin.ModelAdmin):
             return queryset.filter(apartment__owner=request.user)
 
 
-class BillFileAdmin(admin.ModelAdmin):
-    list_display = ("id", "bill", "file")
-    search_fields = ("bill__apartment__id",)
-
-
 admin.site.register(Bill, BillAdmin)
-admin.site.register(BillFile, BillFileAdmin)
 
 
 admin.site.register(models.CustomUser, CustomUserAdmin)

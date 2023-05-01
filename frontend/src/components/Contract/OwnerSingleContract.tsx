@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Contract } from '../../types';
-import { Box, Heading, VStack, Text, HStack } from '@chakra-ui/react';
+import { Box, Heading, VStack, Text, HStack, Button } from '@chakra-ui/react';
 import UpdateContractForm from './UpdateContractForm';
 import DeleteContract from './DeleteContract';
 import api from '../../utils/api';
+import UploadFileForm from '../images/UploadFileForm';
+import { handleDownloadFile } from '../images/handleDownloadFile';
+import FileStatus from '../images/fileStatus';
+import DeleteFileButton from '../images/DeleteFileButton';
 
 const OwnerSingleContract: React.FC = () => {
     const { apartmentId, roomId, contractId } = useParams<{
@@ -39,6 +43,20 @@ const OwnerSingleContract: React.FC = () => {
       navigate(-1);
     };
   
+    const handleUpload = async (updatedContract: Contract) => {
+      setContract(updatedContract);
+    };
+  
+    const handleDownload = () => {
+      handleDownloadFile(
+        `/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/download/`,
+        contractId || '',
+        'contract',
+        'pdf' // Assuming the file extension is 'pdf', change it if necessary
+      );
+    };
+    
+
     if (status === 'loading') {
       return <div>Loading...</div>;
     }
@@ -84,6 +102,23 @@ const OwnerSingleContract: React.FC = () => {
             apartmentId={apartmentId}
             roomId={roomId}
           />
+          <UploadFileForm
+          onUpload={handleUpload}
+          accept=".pdf"
+          apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/`}
+        />
+        <Button colorScheme="blue" onClick={handleDownload}>
+          Download Contract
+        </Button>
+        <FileStatus hasFile={!!contract.file} fileType="Contract" />
+        <DeleteFileButton
+        fileType="contract"
+        apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/delete-file/`}
+        onDelete={() => {
+          setContract({ ...contract, file: null });
+  }}
+/>
+
         </HStack>
       </Box>
     );

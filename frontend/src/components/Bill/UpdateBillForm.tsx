@@ -20,6 +20,7 @@ const UpdateBillForm: React.FC<UpdateBillFormProps> = ({ bill, apartmentId, bill
 
     try {
       const response = await api.patch(`/owner/owner-apartments/${bill.apartment}/bills/${bill.id}/`, {
+        apartment: apartmentId,
         bill_type: billType,
         amount: amount,
         date: date,

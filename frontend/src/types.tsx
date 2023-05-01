@@ -64,6 +64,7 @@ export interface CustomUser {
     rent_amount: number;
     deposit_amount: number;
     terms_and_conditions: string | null;
+    file: File | null;
   }
   
   
@@ -77,7 +78,7 @@ export interface CustomUser {
     created_at: string; // Date string
     updated_at: string; // Date string
     document: string | null; // URL of the file
-    files: BillFile[];
+    file: File | null;
   }
 
   export namespace Bill {
@@ -90,11 +91,7 @@ export interface CustomUser {
     ];
   }
   
-  export interface BillFile {
-    id: number;
-    bill: Bill;
-    file: string; // URL of the file
-  }
+
   
   export interface Review {
     id: number;

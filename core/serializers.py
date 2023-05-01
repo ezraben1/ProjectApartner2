@@ -24,21 +24,20 @@ class BillSerializer(serializers.ModelSerializer):
             "date",
             "created_by",
             "created_at",
+            "file",
         ]
         read_only_fields = ["created_by", "created_at"]
 
     def validate(self, data):
         # Validate apartment ownership
         user = self.context["request"].user
-        apartment = data["apartment"]
-        if apartment.owner != user:
+        if "apartment" in data and data["apartment"].owner != user:
             raise serializers.ValidationError(
                 "You are not the owner of this apartment."
             )
 
         # Validate date is not in the future
-        date = data["date"]
-        if date > timezone.localdate():
+        if "date" in data and data["date"] > timezone.localdate():
             raise serializers.ValidationError("Date cannot be in the future.")
 
         return data
@@ -91,6 +90,7 @@ class ContractSerializer(serializers.ModelSerializer):
     apartment_id = serializers.PrimaryKeyRelatedField(
         source="room.apartment.id", read_only=True
     )
+    file = serializers.FileField(required=False)
 
     class Meta:
         model = Contract
@@ -102,6 +102,7 @@ class ContractSerializer(serializers.ModelSerializer):
             "end_date",
             "deposit_amount",
             "rent_amount",
+            "file",
         ]
 
 
