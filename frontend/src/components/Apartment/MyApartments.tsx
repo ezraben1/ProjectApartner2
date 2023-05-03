@@ -55,65 +55,74 @@ const MyApartments: React.FC = () => {
         <AddApartmentForm />
       </Flex>
 
-      <List spacing={4}>
-        {apartments.map((apartment: Apartment) => (
-          <Link to={`/owner/my-apartments/${apartment.id}`}>
-            <ListItem
-              p="4"
-              rounded="md"
-              bg="gray.50"
-              boxShadow="md"
-              transition="background 0.2s"
-              _hover={{
-                bg: 'gray.100',
-              }}
-            >
-              <VStack align="stretch" spacing={4}>
-                <Flex justify="space-between" align="center">
-                  <Heading size="md">{apartment.address}</Heading>
-                  <Text fontSize="lg" color="red.500">{apartment.address}</Text>
-                  <ApartmentThumbnail src={apartment.images?.[0]?.image || ''} />
-
+      <List spacing={6}>
+  {apartments.map((apartment: Apartment) => (
+    <Link to={`/owner/my-apartments/${apartment.id}`}>
+      <ListItem
+        p={6}
+        rounded="md"
+        bg="white"
+        boxShadow="md"
+        transition="all 0.2s"
+        _hover={{
+          bg: 'gray.50',
+          transform: 'translateY(-4px)',
+          boxShadow: 'xl',
+        }}
+      >
+        <Flex justify="space-between" align="center">
+          <VStack align="start" spacing={2}>
+            <Heading size="md" color="gray.800">{apartment.address}</Heading>
+            <Text fontSize="lg" color="red.500" fontWeight="semibold">{apartment.rooms?.length} Rooms</Text>
+            <Text fontSize="md" color="gray.500">{apartment.description}</Text>
+          </VStack>
+          <ApartmentThumbnail src={apartment.images?.[0]?.image || ''} />
+        </Flex>
+        <List spacing={4} mt={4}>
+          {apartment.rooms?.map((room: Room) => (
+            <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
+              <ListItem
+                p={4}
+                rounded="md"
+                bg="gray.50"
+                boxShadow="md"
+                transition="all 0.2s"
+                _hover={{
+                  bg: 'gray.100',
+                  transform: 'translateY(-2px)',
+                  boxShadow: 'lg',
+                }}
+              >
+                <Flex align="center">
+                  <RoomThumbnail src={room.images[0]?.image || ''} />
+                  <VStack align="start" spacing={2} ml={4}>
+                    <Heading size="sm" color="gray.800">{room.description}</Heading>
+                    <Text fontSize="md" color="gray.500">Price per month: {room.price_per_month}</Text>
+                    <Text fontSize="md" color="gray.500">Size: {room.size}</Text>
+                  </VStack>
                 </Flex>
-                <Text>{apartment.description}</Text>
-                <List spacing={3}>
-                {apartment.rooms?.map((room: Room) => (
-                    <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
-                      <ListItem
-                          p="4"
-                          rounded="md"
-                          bg="gray.100"
-                          boxShadow="md"
-                          transition="background 0.2s"
-                          _hover={{
-                            bg: 'gray.200',
-                          }}
-                        >
-                          <Flex align="center">
-                            <RoomThumbnail src={room.images[0]?.image || ''} />
-                            <VStack align="start" spacing={2} marginLeft="16px">
-                              <Heading size="sm">{room.description}</Heading>
-                              <Text>Price per month: {room.price_per_month}</Text>
-                              <Text>Size: {room.size}</Text>
-                            </VStack>
-                          </Flex>
-                        </ListItem>
-                    </Link>
-                  ))}
-                </List>
-                <Flex justify="space-between" align="center">
-                <Button as={Link} to={`/owner/my-apartments/${apartment.id}/contracts?apartmentId=${apartment.id}`} colorScheme="blue">
-                View Contracts
-                </Button>                  
-                <Link to={`/owner/my-apartments/${apartment.id}/bills`}>
-                <Button colorScheme="green" ml={2}>View Bills</Button>
-                </Link>
-                </Flex>
-              </VStack>
-            </ListItem>
+              </ListItem>
+            </Link>
+          ))}
+        </List>
+        <Flex justify="flex-end" align="center" mt={4}>
+          <Button
+            as={Link}
+            to={`/owner/my-apartments/${apartment.id}/contracts?apartmentId=${apartment.id}`}
+            colorScheme="blue"
+            size="sm"
+            mr={2}
+          >
+            View Contracts
+          </Button>
+          <Link to={`/owner/my-apartments/${apartment.id}/bills`}>
+            <Button colorScheme="green" size="sm">View Bills</Button>
           </Link>
-        ))}
-      </List>
+        </Flex>
+      </ListItem>
+    </Link>
+  ))}
+</List>
     </Box>
   );
 };

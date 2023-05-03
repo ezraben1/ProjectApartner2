@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Flex } from '@chakra-ui/react';
 import Header from './Header';
 import Footer from './Footer';
 import Main from './Main';
@@ -9,16 +10,15 @@ interface LayoutProps {
   onLoginSuccess: (token?: string) => void;
 }
 
-
 const Layout: React.FC<LayoutProps> = ({ children, currentUser, onLoginSuccess }) => {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <Box height="100%" display="flex" flexDirection="column">
       <Header currentUser={currentUser} onLoginSuccess={onLoginSuccess} />
-      <div className="content flex-grow-1">
+      <Flex flex="1" flexDirection="column">
         <Main>{children}</Main>
-      </div>
+      </Flex>
       {children && <Footer />}
-    </div>
+    </Box>
   );
 };
 

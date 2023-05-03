@@ -9,6 +9,7 @@ import AddRoomForm from '../Room/AddRoomForm';
 import api from '../../utils/api';
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import ApartmentThumbnail from '../images/ApartmentThumbnail';
+import RoomThumbnail from '../images/RoomThumbnail';
 
 interface ImageItem {
   id: number;
@@ -126,51 +127,66 @@ const SingleApartment: React.FC = () => {
 
   return (
     
-    <Box maxW="800px" mx="auto" p="6" bg="white" borderRadius="lg" boxShadow="md">
+    <Box maxW="1000px" mx="auto" p="6" bg="white" borderRadius="lg" boxShadow="md">
       <Flex justify="center" align="center">
       <Heading>{apartment.address}</Heading>
       </Flex>
       <VStack align="stretch" spacing={6}>
-        <Flex justify="center" align="center" >
-        <Flex align="center" justify="center" mt={4}>
-          {imageItems && imageItems.length > 0 && (
-            <>
-            <IconButton
-              aria-label="Previous image"
-              icon={<ChevronLeftIcon />}
-              onClick={handleImagePrev}
-              isDisabled={imageItems.length <= 1}
-              colorScheme="gray"
-              variant="outline"
-            />
-            <Box objectFit='cover'  boxSize="md" borderRadius="fill" overflow="hidden" >
-              <Image
-                src={(imageItems[selectedImageIndex] as ImageItem).original}
-                alt={(imageItems[selectedImageIndex] as ImageItem).original}
-                objectFit="contain"
-              />
-            </Box>
-            <IconButton
-              aria-label="Next image"
-              icon={<ChevronRightIcon />}
-              onClick={handleImageNext}
-              isDisabled={imageItems.length <= 1}
-              colorScheme="gray"
-              variant="outline"
-            />
-            <IconButton
-              aria-label="Delete image"
-              icon={<DeleteIcon />}
-              onClick={() => handleDeleteImage((imageItems[selectedImageIndex] as ImageItem).id)}
-              colorScheme="red"
-              variant="outline"
-              ml={2}
-            />
+          <Flex justify="center" align="center" mt={4}>
+              {imageItems && imageItems.length > 0 && (
+                <>
+                  <IconButton
+                    aria-label="Previous image"
+                    icon={<ChevronLeftIcon />}
+                    onClick={handleImagePrev}
+                    isDisabled={imageItems.length <= 1}
+                    colorScheme="gray"
+                    variant="outline"
+                    size="sm"
+                  />
 
-            </>
-          )}
-        </Flex>
-          </Flex>
+                  <Box w="900px" h="450px" borderRadius="fill" overflow="hidden" boxShadow="lg">
+                    <Image
+                      src={(imageItems[selectedImageIndex] as ImageItem).original}
+                      alt={(imageItems[selectedImageIndex] as ImageItem).original}
+                      objectFit="contain"
+                      w="100%"
+                      h="100%"
+                    />
+                  </Box>
+
+                  <IconButton
+                    aria-label="Next image"
+                    icon={<ChevronRightIcon />}
+                    onClick={handleImageNext}
+                    isDisabled={imageItems.length <= 1}
+                    colorScheme="gray"
+                    variant="outline"
+                    size="sm"
+                  />
+
+                  <IconButton
+                    aria-label="Delete image"
+                    icon={<DeleteIcon />}
+                    onClick={() => handleDeleteImage((imageItems[selectedImageIndex] as ImageItem).id)}
+                    colorScheme="red"
+                    variant="outline"
+                    ml={2}
+                    size="sm"
+                  />
+                </>
+              )}
+            </Flex>
+
+          <Flex direction="column" alignItems="flex-start">
+              <Text fontSize="lg" fontWeight="bold" mb={2}>Upload Images:</Text>
+              <InputGroup>
+            <Input type="file" accept="image/*" onChange={handleImageChange} />
+                <InputRightElement>
+                  <IconButton aria-label="Upload" icon={<AddIcon />} />
+                </InputRightElement>
+              </InputGroup>
+            </Flex>
           <Flex>
           <UpdateApartmentForm apartment={apartment} onUpdate={updateApartment} />
           <Box  ml={30}>
@@ -199,12 +215,17 @@ const SingleApartment: React.FC = () => {
                   }}
                   >
                     <Heading as="h1" size="xl" textAlign="center" my={8}>
-                      Room #{room.id} <ApartmentThumbnail src={room.images?.[0]?.image || ''} />
-                    </Heading>
-                    <Text fontWeight="bold">Price per month:</Text>
-                    <Text>{room.price_per_month}</Text>
-                    <Text fontWeight="bold">Size:</Text>
-                    <Text>{room.size}</Text>
+                        Room #{room.id}
+                      </Heading>
+                      <Flex align="center" justify="center" mb={8}>
+                        <ApartmentThumbnail src={room.images?.[0]?.image || ''} />
+                      </Flex>
+                      <VStack spacing={2} alignItems="start">
+                        <Text fontWeight="bold">Price per month:</Text>
+                        <Text>{room.price_per_month}</Text>
+                        <Text fontWeight="bold">Size:</Text>
+                        <Text>{room.size}</Text>
+                      </VStack>
                   </ListItem>
                 </Link>
               ))}
@@ -223,15 +244,7 @@ const SingleApartment: React.FC = () => {
             </Flex>
           </Flex>
         </VStack>
-        <Flex direction="column" alignItems="flex-start">
-              <Text fontSize="lg" fontWeight="bold" mb={2}>Upload Images:</Text>
-              <InputGroup>
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
-                <InputRightElement>
-                  <IconButton aria-label="Upload" icon={<AddIcon />} />
-                </InputRightElement>
-              </InputGroup>
-            </Flex>
+        
       </Box>
     );
   };
