@@ -2,8 +2,10 @@ from django.urls import path
 from rest_framework_nested import routers
 from . import views
 from core.views import (
+    ApartmentImageViewSet,
     ContractViewSet,
     BillViewSet,
+    RoomImageViewSet,
     RoomViewSet,
 )
 
@@ -161,14 +163,24 @@ urlpatterns = [
         ContractViewSet.as_view({"delete": "delete_file"}),
         name="delete_contract_file",
     ),
-    # path(
-    #     "owner-apartments/<int:apartment_id>/images/<int:pk>/delete-file/",
-    #     ApartmentImageViewSet.as_view({"delete": "delete_file"}),
-    #     name="delete_apartment_image_file",
-    # ),
-    # path(
-    #     "owner-rooms/<int:room_id>/images/<int:pk>/delete-file/",
-    #     RoomImageViewSet.as_view({"delete": "delete_file"}),
-    #     name="delete_room_image_file",
-    # ),
+    path(
+        "owner-apartments/<int:apartment_id>/images/",
+        ApartmentImageViewSet.as_view({"get": "list"}),
+        name="apartment_image_list",
+    ),
+    path(
+        "owner-apartments/<int:apartment_id>/images/<int:pk>/",
+        ApartmentImageViewSet.as_view({"get": "retrieve", "delete": "destroy"}),
+        name="apartment_image_detail",
+    ),
+    path(
+        "owner-rooms/<int:room_id>/images/",
+        RoomImageViewSet.as_view({"get": "list"}),
+        name="room_image_list",
+    ),
+    path(
+        "owner-rooms/<int:room_id>/images/<int:pk>/",
+        RoomImageViewSet.as_view({"get": "retrieve", "delete": "destroy"}),
+        name="room_image_detail",
+    ),
 ] + router.urls

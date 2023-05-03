@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import Apartment, Bill, Contract, Review, Room
+from .models import Apartment, ApartmentImage, Bill, Contract, Review, Room, RoomImage
 from rest_framework.permissions import BasePermission
 
 
@@ -34,6 +34,10 @@ class IsApartmentOwner(permissions.BasePermission):
             )  # Check the owner of the room's apartment
         elif isinstance(obj, Review):
             return obj.apartment.owner == request.user
+        elif isinstance(obj, ApartmentImage):
+            return obj.apartment.owner == request.user
+        elif isinstance(obj, RoomImage):
+            return obj.room.apartment.owner == request.user
         else:
             return False
 

@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .models import (
+    ApartmentImage,
     Contract,
     CustomUser,
     Review,
@@ -31,6 +32,29 @@ from django.conf import settings
 import os
 import mimetypes
 from django.http import FileResponse
+from django.http import JsonResponse
+
+
+class ApartmentImageViewSet(ModelViewSet):
+    serializer_class = serializers.ApartmentImageSerializer
+    queryset = ApartmentImage.objects.all()
+    permission_classes = [permissions.IsAuthenticated, IsApartmentOwner]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RoomImageViewSet(ModelViewSet):
+    serializer_class = serializers.RoomImageSerializer
+    queryset = RoomImage.objects.all()
+    permission_classes = [permissions.IsAuthenticated, IsApartmentOwner]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ApartmentViewSet(ModelViewSet):
@@ -220,16 +244,6 @@ class RoomViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class RoomImageViewSet(ModelViewSet):
-    serializer_class = serializers.RoomImageSerializer
-
-    def get_serializer_context(self):
-        return {"room_id": self.kwargs["room_pk"]}
-
-    def get_queryset(self):
-        return RoomImage.objects.filter(room_id=self.kwargs["room_pk"])
 
 
 class CustomUserViewSet(ModelViewSet):

@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Apartment, Room } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, Stack, InputGroup, InputRightElement } from '@chakra-ui/react';
+import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
 import UpdateApartmentForm from './UpdateApartmentForm';
 import DeleteApartment from './DeleteApartment';
 import AddRoomForm from '../Room/AddRoomForm';
 import api from '../../utils/api';
-import { AddIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { AddIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import ApartmentThumbnail from '../images/ApartmentThumbnail';
+
+interface ImageItem {
+  id: number;
+  original: string;
+  thumbnail: string;
+  renderItem: () => JSX.Element;
+}
 
 const SingleApartment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,6 +89,7 @@ const SingleApartment: React.FC = () => {
   };
 
   const imageItems = apartment?.images.map((image) => ({
+    id: image.id,
     original: image.image,
     thumbnail: image.image,
     renderItem: () => (
@@ -89,7 +97,6 @@ const SingleApartment: React.FC = () => {
         <img src={image.image} alt="Apartment" style={{ objectFit: 'contain' }} />
       </Box>
     ),
-    
   }));
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -105,10 +112,6 @@ const SingleApartment: React.FC = () => {
       setSelectedImageIndex((prevIndex) => (prevIndex - 1 + imageItems.length) % imageItems.length);
     }
   };
-
-  
-
-  
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -132,29 +135,38 @@ const SingleApartment: React.FC = () => {
         <Flex align="center" justify="center" mt={4}>
           {imageItems && imageItems.length > 0 && (
             <>
-              <IconButton
-                aria-label="Previous image"
-                icon={<ChevronLeftIcon />}
-                onClick={handleImagePrev}
-                isDisabled={imageItems.length <= 1}
-                colorScheme="gray"
-                variant="outline"
+            <IconButton
+              aria-label="Previous image"
+              icon={<ChevronLeftIcon />}
+              onClick={handleImagePrev}
+              isDisabled={imageItems.length <= 1}
+              colorScheme="gray"
+              variant="outline"
+            />
+            <Box objectFit='cover'  boxSize="md" borderRadius="fill" overflow="hidden" >
+              <Image
+                src={(imageItems[selectedImageIndex] as ImageItem).original}
+                alt={(imageItems[selectedImageIndex] as ImageItem).original}
+                objectFit="contain"
               />
-              <Box objectFit='cover'  boxSize="md" borderRadius="fill" overflow="hidden" >
-                <Image
-                  src={imageItems[selectedImageIndex].original}
-                  alt={imageItems[selectedImageIndex].original}
-                  objectFit="contain"
-                />
-              </Box>
-              <IconButton
-                aria-label="Next image"
-                icon={<ChevronRightIcon />}
-                onClick={handleImageNext}
-                isDisabled={imageItems.length <= 1}
-                colorScheme="gray"
-                variant="outline"
-              />
+            </Box>
+            <IconButton
+              aria-label="Next image"
+              icon={<ChevronRightIcon />}
+              onClick={handleImageNext}
+              isDisabled={imageItems.length <= 1}
+              colorScheme="gray"
+              variant="outline"
+            />
+            <IconButton
+              aria-label="Delete image"
+              icon={<DeleteIcon />}
+              onClick={() => handleDeleteImage((imageItems[selectedImageIndex] as ImageItem).id)}
+              colorScheme="red"
+              variant="outline"
+              ml={2}
+            />
+
             </>
           )}
         </Flex>

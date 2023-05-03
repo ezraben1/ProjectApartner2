@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Room, CustomUser, Contract, RoomImage } from '../../types';
 import { useParams, Link } from 'react-router-dom';
 import { Box, Heading, VStack, Text, Button, HStack, Input, Flex, IconButton,Image, InputGroup, InputRightElement, StatGroup, StatLabel, StatNumber, Stat, Center  } from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
 import UpdateRoomForm from './UpdateRoomForm';
 import DeleteRoom from './DeleteRoom';
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import AddContract from '../Contract/AddContract';
 import api from '../../utils/api';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { deleteImage } from '../images/imageUtils';
 
 const OwnerSingleRoom: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -77,28 +78,19 @@ const OwnerSingleRoom: React.FC = () => {
     }
   };
   
-  const handleDeleteImage = async (imageId: number) => {
-    try {
-      await api.remove(`/owner/owner-rooms/${room?.id}/images/${imageId}/`);
+  const handleDeleteImage = (imageId: number) => {
+    const endpoint = `/owner/owner-rooms/${room?.id}/images/${imageId}/`;
+    deleteImage(endpoint, (id) => {
       setRoom((prev) => {
         if (prev) {
           return {
             ...prev,
-            images: prev.images.filter((image: RoomImage) => image.id !== imageId),
+            images: prev.images.filter((image: RoomImage) => image.id !== id),
           };
         }
         return null;
       });
-      alert('Image deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting image:', error);
-
-      if (error && (error as any).response && (error as any).response.data) {
-        console.error('Server error message:', (error as any).response.data);
-      }
-
-      alert('Failed to delete image.');
-    }
+    }, imageId);
   };
 
   const imageItems = room?.images.map((image) => ({
@@ -175,6 +167,15 @@ const OwnerSingleRoom: React.FC = () => {
           colorScheme="gray"
           variant="outline"
         />
+        <IconButton
+            aria-label="Delete image"
+            icon={<DeleteIcon />}
+            onClick={() => handleDeleteImage(room.images[selectedImageIndex].id)}
+            colorScheme="red"
+            variant="outline"
+            ml={2}
+          />
+
       </>
     )}
     

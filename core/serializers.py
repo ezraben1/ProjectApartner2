@@ -51,8 +51,8 @@ class ApartmentImageSerializer(serializers.ModelSerializer):
         )
 
     class Meta:
-        model = RoomImage
-        fields = ["id", "image"]
+        model = ApartmentImage
+        fields = ["id", "image", "apartment_id"]
 
 
 class ApartmentSerializer(serializers.ModelSerializer):
@@ -113,7 +113,7 @@ class RoomImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoomImage
-        fields = ["id", "image"]
+        fields = ["id", "image", "room_id"]
 
 
 class RoomSerializer(serializers.ModelSerializer):
