@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Apartment, Room } from '../../types';
 import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, InputGroup, InputRightElement } from '@chakra-ui/react';
+import { List, ListItem, Button, Heading, Text, Flex, Box, VStack, Input, IconButton, Image, InputGroup, InputRightElement, StatGroup, Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
 import UpdateApartmentForm from './UpdateApartmentForm';
 import DeleteApartment from './DeleteApartment';
@@ -9,7 +9,6 @@ import AddRoomForm from '../Room/AddRoomForm';
 import api from '../../utils/api';
 import { AddIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import ApartmentThumbnail from '../images/ApartmentThumbnail';
-import RoomThumbnail from '../images/RoomThumbnail';
 
 interface ImageItem {
   id: number;
@@ -132,52 +131,78 @@ const SingleApartment: React.FC = () => {
       <Heading>{apartment.address}</Heading>
       </Flex>
       <VStack align="stretch" spacing={6}>
-          <Flex justify="center" align="center" mt={4}>
-              {imageItems && imageItems.length > 0 && (
-                <>
-                  <IconButton
-                    aria-label="Previous image"
-                    icon={<ChevronLeftIcon />}
-                    onClick={handleImagePrev}
-                    isDisabled={imageItems.length <= 1}
-                    colorScheme="gray"
-                    variant="outline"
-                    size="sm"
-                  />
-
-                  <Box w="900px" h="450px" borderRadius="fill" overflow="hidden" boxShadow="lg">
-                    <Image
-                      src={(imageItems[selectedImageIndex] as ImageItem).original}
-                      alt={(imageItems[selectedImageIndex] as ImageItem).original}
-                      objectFit="contain"
-                      w="100%"
-                      h="100%"
+      <Flex justify="center" align="center" mt={4}>
+                {imageItems && imageItems.length > 0 && (
+                  <>
+                    <IconButton
+                      aria-label="Previous image"
+                      icon={<ChevronLeftIcon />}
+                      onClick={handleImagePrev}
+                      isDisabled={imageItems.length <= 1}
+                      colorScheme="gray"
+                      variant="outline"
+                      size="sm"
                     />
-                  </Box>
 
-                  <IconButton
-                    aria-label="Next image"
-                    icon={<ChevronRightIcon />}
-                    onClick={handleImageNext}
-                    isDisabled={imageItems.length <= 1}
-                    colorScheme="gray"
-                    variant="outline"
-                    size="sm"
-                  />
+                    <Box maxW="100%" h="450px" borderRadius="lg" overflow="hidden" >
+                      <Image
+                        src={(imageItems[selectedImageIndex] as ImageItem).original}
+                        alt={(imageItems[selectedImageIndex] as ImageItem).original}
+                        objectFit="contain"
+                        w="100%"
+                        h="100%"
+                      />
+                    </Box>
 
-                  <IconButton
-                    aria-label="Delete image"
-                    icon={<DeleteIcon />}
-                    onClick={() => handleDeleteImage((imageItems[selectedImageIndex] as ImageItem).id)}
-                    colorScheme="red"
-                    variant="outline"
-                    ml={2}
-                    size="sm"
-                  />
-                </>
-              )}
-            </Flex>
+                    <IconButton
+                      aria-label="Next image"
+                      icon={<ChevronRightIcon />}
+                      onClick={handleImageNext}
+                      isDisabled={imageItems.length <= 1}
+                      colorScheme="gray"
+                      variant="outline"
+                      size="sm"
+                    />
 
+                    <IconButton
+                      aria-label="Delete image"
+                      icon={<DeleteIcon />}
+                      onClick={() => handleDeleteImage((imageItems[selectedImageIndex] as ImageItem).id)}
+                      colorScheme="red"
+                      variant="outline"
+                      ml={2}
+                      size="sm"
+                    />
+                  </>
+                )}
+              </Flex>
+
+              <StatGroup width="100%" justifyContent="space-around" mt={4}>
+                  <Stat>
+                    <StatLabel fontSize="md">Size</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.size} sqm </StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel fontSize="md">Balcony</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.balcony ? 'Yes' : 'No'}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel fontSize="md">Smoking</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.smoking_allowed ? 'Yes' : 'No'}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel fontSize="md">Pets</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.allowed_pets ? 'Yes' : 'No'}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel fontSize="md">AC</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.ac ? 'Yes' : 'No'}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel fontSize="md">BBQ</StatLabel>
+                    <StatNumber fontSize="sm">{apartment.bbq_allowed ? 'Yes' : 'No'}</StatNumber>
+                  </Stat>
+                </StatGroup>
           <Flex direction="column" alignItems="flex-start">
               <Text fontSize="lg" fontWeight="bold" mb={2}>Upload Images:</Text>
               <InputGroup>

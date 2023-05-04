@@ -28,8 +28,14 @@ interface UpdateRoomFormProps {
 const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room,apartmentId, onUpdate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updatedRoom, setUpdatedRoom] = useState<Room>(room);
+  const [renterSearch, setRenterSearch] = useState('');
 
   const toast = useToast();
+
+  const handleRenterSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setRenterSearch(value);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,9 +49,10 @@ const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room,apartmentId, onUpd
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
+     try {
       const response = await api.patch(`/owner/owner-apartments/${apartmentId}/room/${room.id}/`, {
         ...updatedRoom,
+        renter_search: renterSearch,
         apartment_id: apartmentId,
       });
       const data = await response.json();
@@ -90,6 +97,15 @@ const UpdateRoomForm: React.FC<UpdateRoomFormProps> = ({ room,apartmentId, onUpd
                 name="description"
                 value={updatedRoom.description || ''}
                 onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Renter Search</FormLabel>
+              <Input
+                name="renter_search"
+                value={renterSearch}
+                onChange={handleRenterSearchChange}
+                placeholder="Search for renter users"
               />
             </FormControl>
             <FormControl mt={4}>

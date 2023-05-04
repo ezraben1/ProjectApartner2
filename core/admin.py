@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from django.contrib import admin
 from django.db.models.aggregates import Count
 from django.utils.html import format_html
@@ -70,7 +71,10 @@ class CustomUserAdmin(UserAdmin):
 
     fieldsets = (
         (None, {"fields": ("username", "email", "password")}),
-        ("Personal info", {"fields": ("first_name", "last_name", "user_type")}),
+        (
+            "Personal info",
+            {"fields": ("first_name", "last_name", "user_type", "avatar")},
+        ),
         (
             "Permissions",
             {

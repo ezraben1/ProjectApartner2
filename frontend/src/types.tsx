@@ -1,15 +1,17 @@
 export interface CustomUser {
-    id: number;
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    user_type: 'owner' | 'renter' | 'searcher';
-    is_superuser: boolean;
-    is_staff: boolean;
-    is_active: boolean;
-    date_joined: string;
-  }
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  user_type: 'owner' | 'renter' | 'searcher';
+  is_superuser: boolean;
+  is_staff: boolean;
+  is_active: boolean;
+  date_joined: string;
+  avatar: string; 
+}
+
   
   export interface Apartment {
     id: number;

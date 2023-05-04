@@ -47,19 +47,18 @@ const MyApartments: React.FC = () => {
   if (status === 'error' || !apartments) {
     return <div>Error loading apartment data.</div>;
   }
+return(
+  <Box maxW="1200px" mx="auto" p="6">
+  <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" mb={{ base: 6, md: 0 }}>
+    <Heading>My Apartments</Heading>
+    <AddApartmentForm />
+  </Flex>
 
-  return (
-    <Box maxW="800px" mx="auto" p="6">
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading>My Apartments</Heading>
-        <AddApartmentForm />
-      </Flex>
-
-      <List spacing={6}>
+  <List spacing={6}>
   {apartments.map((apartment: Apartment) => (
-    <Link to={`/owner/my-apartments/${apartment.id}`}>
+    <Link to={`/owner/my-apartments/${apartment.id}`} key={apartment.id}>
       <ListItem
-        p={6}
+        p={{ base: 4, md: 6 }}
         rounded="md"
         bg="white"
         boxShadow="md"
@@ -69,12 +68,13 @@ const MyApartments: React.FC = () => {
           transform: 'translateY(-4px)',
           boxShadow: 'xl',
         }}
+        maxW={{ base: 'full', md: '800px' }}
       >
-        <Flex justify="space-between" align="center">
+        <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center">
           <VStack align="start" spacing={2}>
             <Heading size="md" color="gray.800">{apartment.address}</Heading>
-            <Text fontSize="lg" color="red.500" fontWeight="semibold">{apartment.rooms?.length} Rooms</Text>
-            <Text fontSize="md" color="gray.500">{apartment.description}</Text>
+            <Text fontSize={{ base: 'md', md: 'lg' }} color="red.500" fontWeight="semibold">{apartment.rooms?.length} Rooms</Text>
+            <Text fontSize={{ base: 'sm', md: 'md' }} color="gray.500">{apartment.description}</Text>
           </VStack>
           <ApartmentThumbnail src={apartment.images?.[0]?.image || ''} />
         </Flex>
@@ -82,7 +82,7 @@ const MyApartments: React.FC = () => {
           {apartment.rooms?.map((room: Room) => (
             <Link key={room.id} to={`/owner/my-apartments/${apartment.id}/room/${room.id}`}>
               <ListItem
-                p={4}
+                p={{ base: 2, md: 4 }}
                 rounded="md"
                 bg="gray.50"
                 boxShadow="md"
@@ -95,10 +95,10 @@ const MyApartments: React.FC = () => {
               >
                 <Flex align="center">
                   <RoomThumbnail src={room.images[0]?.image || ''} />
-                  <VStack align="start" spacing={2} ml={4}>
+                  <VStack align="start" spacing={2} ml={{ base: 2, md: 4 }}>
                     <Heading size="sm" color="gray.800">{room.description}</Heading>
-                    <Text fontSize="md" color="gray.500">Price per month: {room.price_per_month}</Text>
-                    <Text fontSize="md" color="gray.500">Size: {room.size}</Text>
+                    <Text fontSize={{ base: 'sm', md: 'md' }} color="gray.500">Price per month: {room.price_per_month}</Text>
+                    <Text fontSize={{ base: 'sm', md: 'md' }} color="gray.500">Size: {room.size}</Text>
                   </VStack>
                 </Flex>
               </ListItem>
@@ -110,21 +110,27 @@ const MyApartments: React.FC = () => {
             as={Link}
             to={`/owner/my-apartments/${apartment.id}/contracts?apartmentId=${apartment.id}`}
             colorScheme="blue"
-            size="sm"
+            size={{ base: 'xs', md: 'sm' }}
             mr={2}
           >
             View Contracts
           </Button>
           <Link to={`/owner/my-apartments/${apartment.id}/bills`}>
-            <Button colorScheme="green" size="sm">View Bills</Button>
+            <Button colorScheme="green" size={{ base:"xs", md: "sm" }}>View Bills</Button>
           </Link>
         </Flex>
       </ListItem>
     </Link>
   ))}
 </List>
-    </Box>
-  );
+
+            </Box>
+
+);
+
+
+
+
 };
 
 export default MyApartments;

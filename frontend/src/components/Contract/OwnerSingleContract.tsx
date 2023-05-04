@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Contract } from '../../types';
-import { Box, Heading, VStack, Text, HStack, Button } from '@chakra-ui/react';
+import { Box, Heading, VStack, Text, HStack, Button, StatGroup, StatLabel, StatNumber, Stat, Stack } from '@chakra-ui/react';
 import UpdateContractForm from './UpdateContractForm';
 import DeleteContract from './DeleteContract';
 import api from '../../utils/api';
@@ -72,56 +72,71 @@ const OwnerSingleContract: React.FC = () => {
     
     return (
       <Box>
-        <Heading as="h1" size="xl" textAlign="center" my={8}>
-          Contract #{contract.id}
-        </Heading>
-        <VStack spacing={3} align="start">
-          <Text>
-            <strong>Start Date:</strong> {contract.start_date}
-          </Text>
-          <Text>
-            <strong>End Date:</strong> {contract.end_date}
-          </Text>
-          <Text>
-            <strong>Deposit Amount:</strong> {contract.deposit_amount}
-          </Text>
-          <Text>
-            <strong>Rent Amount:</strong> {contract.rent_amount}
-          </Text>
-        </VStack>
-        <HStack spacing={4} mt={6}>
-        <UpdateContractForm
-        contract={contract}
-        onUpdate={(updatedContract: Contract) => setContract(updatedContract)}
-        apartmentId={apartmentId}
-        roomId={roomId}
-          />
-          <DeleteContract
-            contract={contract}
-            onDelete={handleContractDelete}
-            apartmentId={apartmentId}
-            roomId={roomId}
-          />
-          <UploadFileForm
-          onUpload={handleUpload}
-          accept=".pdf"
-          apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/`}
-        />
-        <Button colorScheme="blue" onClick={handleDownload}>
-          Download Contract
-        </Button>
-        <FileStatus hasFile={!!contract.file} fileType="Contract" />
-        <DeleteFileButton
-        fileType="contract"
-        apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/delete-file/`}
-        onDelete={() => {
-          setContract({ ...contract, file: null });
-  }}
-/>
+  <Heading as="h1" size="xl" textAlign="center" my={8}>
+    Contract #{contract.id}
+  </Heading>
+  <StatGroup width="100%" justifyContent="space-around" mt={4}>
+  <Stat>
+    <StatLabel fontSize="md" textAlign="center">Start </StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+      {contract.start_date}
+    </StatNumber>
+  </Stat>
+  
+  <Stat>
+    <StatLabel fontSize="md" textAlign="center">Deposit </StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+      {contract.deposit_amount}
+    </StatNumber>
+  </Stat>
+  <Stat>
+    <StatLabel fontSize="md" textAlign="center">Rent </StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+      {contract.rent_amount}
+    </StatNumber>
+  </Stat>
+  <Stat>
+    <StatLabel fontSize="md" textAlign="center" >End</StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+      {contract.end_date}
+    </StatNumber>
+  </Stat>
+</StatGroup>
 
-        </HStack>
-      </Box>
+
+  <Stack direction={{ base: 'column', md: 'row' }} spacing={4} mt={6}>
+    <UpdateContractForm
+      contract={contract}
+      onUpdate={(updatedContract: Contract) => setContract(updatedContract)}
+      apartmentId={apartmentId}
+      roomId={roomId}
+    />
+    <DeleteContract
+      contract={contract}
+      onDelete={handleContractDelete}
+      apartmentId={apartmentId}
+      roomId={roomId}
+    />
+    <UploadFileForm
+      onUpload={handleUpload}
+      accept=".pdf"
+      apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/`}
+    />
+    <Button colorScheme="blue" onClick={handleDownload}>
+      Download Contract
+    </Button>
+    <FileStatus hasFile={!!contract.file} fileType="Contract" />
+    <DeleteFileButton
+      fileType="contract"
+      apiEndpoint={`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/${contractId}/delete-file/`}
+      onDelete={() => {
+        setContract({ ...contract, file: null });
+      }}
+    />
+  </Stack>
+</Box>
     );
+    
   };
   
   export default OwnerSingleContract;

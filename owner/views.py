@@ -13,6 +13,21 @@ class OwnerApartmentViewSet(ApartmentViewSet):
     serializer_class = serializers.ApartmentSerializer
     permission_classes = [permissions.IsAuthenticated, IsApartmentOwner]
 
+    def update_apartment(self, request, apartment):
+        data = request.data
+        serializer = self.get_serializer(apartment, data=data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["patch"])
+    def update_apartment_details(self, request, pk=None):
+        apartment = self.get_object()
+        return self.update_apartment(request, apartment)
+
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated and user.user_type == "owner":

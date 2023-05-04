@@ -11,6 +11,30 @@ from .models import (
 )
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            "id",
+            "username",
+            "email",
+            "password",
+            "user_type",
+            "first_name",
+            "last_name",
+            "avatar",
+        )
+        extra_kwargs = {"password": {"write_only": True}}
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = CustomUser(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class BillSerializer(serializers.ModelSerializer):
@@ -79,6 +103,11 @@ class ApartmentSerializer(serializers.ModelSerializer):
             "address",
             "description",
             "size",
+            "balcony",
+            "bbq_allowed",
+            "smoking_allowed",
+            "allowed_pets",
+            "ac",
             "bill_ids",
             "rooms",
             "images",
@@ -122,6 +151,11 @@ class RoomSerializer(serializers.ModelSerializer):
         queryset=Apartment.objects.all(), write_only=True
     )
     contract = ContractSerializer(read_only=True)
+    renter = CustomUserSerializer(read_only=True)
+
+    renter_search = serializers.CharField(
+        required=False, allow_blank=True, write_only=True
+    )
 
     def to_representation(self, instance):
         if self.context.get("nested"):
@@ -142,6 +176,7 @@ class RoomSerializer(serializers.ModelSerializer):
             "renter",
             "apartment",
             "images",
+            "renter_search",
         ]
 
     def create(self, validated_data):
@@ -150,10 +185,17 @@ class RoomSerializer(serializers.ModelSerializer):
         return room
 
     def update(self, instance, validated_data):
-        renter_id = validated_data.pop("renter_id", None)
-        if renter_id is not None:
-            renter = get_object_or_404(CustomUser, id=renter_id, user_type="renter")
-            instance.renter = renter
+        renter_search = validated_data.pop("renter_search", None)
+        if renter_search is not None:
+            if renter_search != "":
+                renter = get_object_or_404(
+                    CustomUser, user_type="renter", username__icontains=renter_search
+                )
+                instance.renter = renter
+            else:
+                instance.renter = None
+            instance.save()
+
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
@@ -168,26 +210,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context["product_id"]
         return Review.objects.create(product_id=product_id, **validated_data)
-
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = (
-            "id",
-            "username",
-            "email",
-            "password",
-            "user_type",
-            "first_name",
-            "last_name",
-            "avatar",
-        )
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = CustomUser(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user

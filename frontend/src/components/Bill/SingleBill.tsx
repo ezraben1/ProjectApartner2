@@ -4,7 +4,7 @@ import { Bill } from '../../types';
 import api from '../../utils/api';
 import DeleteBill from './DeleteBill';
 import UpdateBillForm from './UpdateBillForm';
-import { VStack, Heading, Text, Box, Button } from '@chakra-ui/react';
+import { VStack, Heading, Text, Box, Button, Stack, Stat, StatLabel, StatNumber, StatGroup } from '@chakra-ui/react';
 import UploadFileForm from '../images/UploadFileForm';
 import { handleDownloadFile } from '../images/handleDownloadFile';
 import FileStatus from '../images/fileStatus';
@@ -46,43 +46,60 @@ const SingleBill: React.FC = () => {
 
   return (
     <Box maxW="800px" mx="auto" p="6">
-      <VStack align="start" spacing={4}>
-        <Heading>{bill.bill_type}</Heading>
-        <Text>Amount: ${bill.amount}</Text>
-        <Text>Date: {bill.date}</Text>
-        <DeleteBill apartmentId={apartmentId || ''} billId={billId || ''} />
-        <UploadFileForm
-          onUpload={handleUpload}
-          accept=".pdf"
-          apiEndpoint={`/owner/owner-apartments/${apartmentId}/bills/${billId}/`}
-        />
-        <UpdateBillForm
-          apartmentId={apartmentId || ''}
-          billId={billId || ''}
-          bill={bill || null}
-          onUpdate={(updatedBill: Bill) => {
-            console.log('Bill updated:', updatedBill);
-            // handle the update
-          }}
-        />
-        {bill.file ? (
-          <Button colorScheme="blue" onClick={handleDownload}>
-            Download File
-          </Button>
-        ) : (
-          <Text>No file uploaded</Text>
-        )}
-         <FileStatus hasFile={!!bill.file} fileType="Bill" />
-         <DeleteFileButton
-          fileType="bill"
-          apiEndpoint={`/owner/owner-apartments/${apartmentId}/bills/${billId}/delete-file/`}
-          onDelete={() => {
-            setBill({ ...bill, file: null });
-          }}
-        />
+  <VStack align="start" spacing={4}>
+    <Heading>{bill.bill_type}</Heading>
+    <StatGroup width="100%" justifyContent="space-around" mt={4}>
+    <Stat>
+    <StatLabel fontSize="md" textAlign="center" >Amount</StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+    ${bill.amount}
+    </StatNumber>
+  </Stat>
+  <Stat>
+    <StatLabel fontSize="md" textAlign="center" >Date:</StatLabel>
+    <StatNumber fontSize="sm" textAlign="center">
+      {bill.date}
+    </StatNumber>
+  </Stat>
 
-      </VStack>
-    </Box>
+    
+  </StatGroup>
+
+    <Stack direction={{ base: 'column', md: 'row' }} spacing={4} mt={6}>
+      <DeleteBill apartmentId={apartmentId || ''} billId={billId || ''} />
+      <UploadFileForm
+        onUpload={handleUpload}
+        accept=".pdf"
+        apiEndpoint={`/owner/owner-apartments/${apartmentId}/bills/${billId}/`}
+      />
+      <UpdateBillForm
+        apartmentId={apartmentId || ''}
+        billId={billId || ''}
+        bill={bill || null}
+        onUpdate={(updatedBill: Bill) => {
+          console.log('Bill updated:', updatedBill);
+          // handle the update
+        }}
+      />
+      {bill.file ? (
+        <Button colorScheme="blue" onClick={handleDownload}>
+          Download File
+        </Button>
+      ) : (
+        <Text>No file uploaded</Text>
+      )}
+      <FileStatus hasFile={!!bill.file} fileType="Bill" />
+      <DeleteFileButton
+        fileType="bill"
+        apiEndpoint={`/owner/owner-apartments/${apartmentId}/bills/${billId}/delete-file/`}
+        onDelete={() => {
+          setBill({ ...bill, file: null });
+        }}
+      />
+    </Stack>
+  </VStack>
+</Box>
+
   );
 };
 

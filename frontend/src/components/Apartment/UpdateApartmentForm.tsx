@@ -14,6 +14,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Checkbox,
 } from '@chakra-ui/react';
 import api from '../../utils/api';
 import { Apartment } from '../../types';
@@ -28,10 +29,15 @@ const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
   onUpdate,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [address, setAddress] = useState('');
-  const [description, setDescription] = useState('');
-  const [size, setSize] = useState('');
-
+  const [address, setAddress] = useState(apartment.address);
+  const [description, setDescription] = useState(apartment.description);
+  const [size, setSize] = useState(apartment.size);
+  const [balcony, setBalcony] = useState(!!apartment.balcony);
+  const [bbqAllowed, setBbqAllowed] = useState(apartment.bbq_allowed);
+  const [smokingAllowed, setSmokingAllowed] = useState(apartment.smoking_allowed);
+  const [allowedPets, setAllowedPets] = useState(apartment.allowed_pets);
+  const [ac, setAc] = useState(apartment.ac);
+  
   const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,11 +47,22 @@ const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
         address,
         description,
         size,
+        balcony,
+        bbq_allowed: bbqAllowed,
+        smoking_allowed: smokingAllowed,
+        allowed_pets: allowedPets,
+        ac,
       });
 
       setAddress('');
       setDescription('');
       setSize('');
+      setBalcony(false);
+      setBbqAllowed(false);
+      setSmokingAllowed(false);
+      setAllowedPets(false);
+      setAc(false);
+      
       toast({
         title: 'Apartment updated.',
         description: 'The apartment has been updated successfully.',
@@ -111,6 +128,51 @@ const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
               />
+            </FormControl>
+
+            <FormControl id="balcony" mt={4}>
+              <Checkbox
+                isChecked={balcony}
+                onChange={(e) => setBalcony(e.target.checked)}
+              >
+                Balcony
+              </Checkbox>
+            </FormControl>
+
+            <FormControl id="bbqAllowed" mt={4}>
+              <Checkbox
+                isChecked={bbqAllowed}
+                onChange={(e) => setBbqAllowed(e.target.checked)}
+              >
+                BBQ allowed
+              </Checkbox>
+            </FormControl>
+
+            <FormControl id="smokingAllowed" mt={4}>
+              <Checkbox
+                isChecked={smokingAllowed}
+                onChange={(e) => setSmokingAllowed(e.target.checked)}
+              >
+                Smoking allowed
+              </Checkbox>
+            </FormControl>
+
+            <FormControl id="allowedPets" mt={4}>
+              <Checkbox
+                isChecked={allowedPets}
+                onChange={(e) => setAllowedPets(e.target.checked)}
+              >
+                Allowed pets
+              </Checkbox>
+            </FormControl>
+
+            <FormControl id="ac" mt={4}>
+              <Checkbox
+                isChecked={ac}
+                onChange={(e) => setAc(e.target.checked)}
+              >
+                Air conditioning
+              </Checkbox>
             </FormControl>
           </ModalBody>
           <ModalFooter>

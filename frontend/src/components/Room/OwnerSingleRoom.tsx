@@ -43,6 +43,7 @@ const OwnerSingleRoom: React.FC = () => {
         const roomData = await response.json();
         
         setRoom(roomData);
+        setRenter(roomData.renter); 
         setApartmentId(roomData.apartment_id);
       } catch (error) {
         console.error('Error fetching apartment and room IDs:', error);
@@ -50,6 +51,7 @@ const OwnerSingleRoom: React.FC = () => {
         setLoading(false);
       }
     };
+    
   
     fetchApartmentAndRoomIds();
   }, [id]);
@@ -126,127 +128,141 @@ const OwnerSingleRoom: React.FC = () => {
   }
 
   return (
-    
-    <Box>
-       <Heading as="h1" size="xl" textAlign="center" my={8}>
-    Room #{room.id}
-  </Heading>
+    <Box bg="white" borderRadius="md" boxShadow="xl" p={8}>
+      <Heading as="h1" size="xl" textAlign="center" mb={8}>
+        Room #{room.id}
+      </Heading>
   
-  {/* Add image gallery */}
-  <Flex align="center" justify="center" mt={4}>
-    {room.images && room.images.length > 0 && (
-      <>
-        <IconButton
-          aria-label="Previous image"
-          icon={<ChevronLeftIcon />}
-          onClick={handleImagePrev}
-          isDisabled={room.images.length <= 1}
-          colorScheme="gray"
-          variant="outline"
-        />
-        {room.images.map((image, index) => (
-          <Box
-            key={index}
-            borderRadius="sm"
-            overflow="hidden"
-            display={selectedImageIndex === index ? 'block' : 'none'}
-          >
-            <Image
-              src={image.image}
-              alt={`Room ${room.id} image ${index}`}
-              objectFit="contain"
-              boxSize="lg" // Increase the size of the image here
+      <Flex align="center" justify="center" mb={4}>
+        {room.images && room.images.length > 0 && (
+          <>
+            <IconButton
+              aria-label="Previous image"
+              icon={<ChevronLeftIcon />}
+              onClick={handleImagePrev}
+              isDisabled={room.images.length <= 1}
+              colorScheme="gray"
+              variant="outline"
             />
-          </Box>
-        ))}
-        <IconButton
-          aria-label="Next image"
-          icon={<ChevronRightIcon />}
-          onClick={handleImageNext}
-          isDisabled={room.images.length <= 1}
-          colorScheme="gray"
-          variant="outline"
-        />
-        <IconButton
-            aria-label="Delete image"
-            icon={<DeleteIcon />}
-            onClick={() => handleDeleteImage(room.images[selectedImageIndex].id)}
-            colorScheme="red"
-            variant="outline"
-            ml={2}
-          />
+            {room.images.map((image, index) => (
+              <Box
+                key={index}
+                borderRadius="sm"
+                overflow="hidden"
+                display={selectedImageIndex === index ? 'block' : 'none'}
+              >
+                <Image
+                src={image.image}
+                alt={`Room ${room.id} image ${index}`}
+                objectFit="contain"
+                boxSize={{ base: '350px', md: 'lg', lg: 'xl' }}
+              />
 
-      </>
-    )}
-    
-  </Flex>
+              </Box>
+            ))}
+            <IconButton
+              aria-label="Next image"
+              icon={<ChevronRightIcon />}
+              onClick={handleImageNext}
+              isDisabled={room.images.length <= 1}
+              colorScheme="gray"
+              variant="outline"
+            />
+            <IconButton
+              aria-label="Delete image"
+              icon={<DeleteIcon />}
+              onClick={() => handleDeleteImage(room.images[selectedImageIndex].id)}
+              colorScheme="red"
+              variant="outline"
+              ml={2}
+            />
+          </>
+        )}
+      </Flex>
+      <VStack spacing={4} align="start" width="100%">
+      <StatGroup width="100%" justifyContent="space-around" mt={4}>
+      <Text fontSize="lg" fontWeight="bold" mb={4}>
+          Description
+        </Text>
+        <Text textAlign="center">{room.description}</Text>
 
-  <VStack spacing={4} align="start" width="100%">
-  <Center bg=''>
-    <Text fontSize="lg" fontWeight="bold" mb={4}>
-      Description
-    </Text>
-  </Center>
-  <Text textAlign="center">{room.description}</Text>
+      </StatGroup>
 
-  <StatGroup width="100%" justifyContent="space-around" mt={4}>
-    <Stat>
-      <StatLabel>Size</StatLabel>
-      <StatNumber>{room.size}</StatNumber>
-    </Stat>
-    <Stat>
-      <StatLabel>Price per month</StatLabel>
-      <StatNumber>{room.price_per_month}</StatNumber>
-    </Stat>
-    <Stat>
-      <StatLabel>Has window</StatLabel>
-      <StatNumber>{room.window ? 'Yes' : 'No'}</StatNumber>
-    </Stat>
-  </StatGroup>
+      <StatGroup width="100%" justifyContent="space-around" mt={4}>
+        <Stat>
+          <StatLabel fontSize="md">Size</StatLabel>
+          <StatNumber fontSize="sm">{room.size} sqm</StatNumber>
+        </Stat>
+        <Stat>
+          <StatLabel fontSize="md">Price per month</StatLabel>
+          <StatNumber fontSize="sm">${room.price_per_month}</StatNumber>
+        </Stat>
+        <Stat>
+          <StatLabel fontSize="md">Has window</StatLabel>
+          <StatNumber fontSize="sm">{room.window ? 'Yes' : 'No'}</StatNumber>
+        </Stat>
+      </StatGroup>
+      {room.contract ? (
+        <Box>
+          <Text>
+            <strong>Contract ID:</strong> {room.contract.id}
+          </Text>
+          <Link to={`/owner/my-apartments/${apartmentId}/room/${room.id}/contracts/${room.contract.id}`}>
+            <Button colorScheme="blue">Room Contract</Button>
+          </Link>
+        </Box>
+      ) : (
+        <Text>No contract available for this room.</Text>
+      )}
 
+      {renter ? (
+        <Box>
+          <Text>
+            <strong>Renter name:</strong> {renter.first_name} {renter.last_name}
+          </Text>
+          <Text>
+            <strong>email:</strong> {renter.email} 
+          </Text>
+          <Image src={renter.avatar} alt="Renter's avatar" width="50px" height="50px" />
+        </Box>
+      ) : (
+        <Text>No renter assigned to this room.</Text>
+      )}
 
-  {room.contract ? (
-    <Box>
-      <Text>
-        <strong>Contract ID:</strong> {room.contract.id}
+    </VStack>
+    <Flex justifyContent="center">
+    <HStack spacing={{ base: 2, md: 4 }} justifyContent="space-between" flexWrap={{ base: 'wrap', md: 'nowrap' }} mt={{ base: 4, md: 6 }}>
+  <Box flex="1">
+    <UpdateRoomForm
+      room={room}
+      apartmentId={apartmentId}
+      onUpdate={(updatedRoom: Room) => setRoom(updatedRoom)}
+    />
+  </Box>
+  <Box flex="1">
+    <DeleteRoom roomId={room.id} apartmentId={apartmentId} onDelete={handleRoomDelete} />
+  </Box>
+  <Box flex="1">
+    <AddContract roomId={room.id} apartmentId={apartmentId} onCreate={handleContractCreate} />
+  </Box>
+  <Box flex={{ base: '1', md: '0' }} mt={{ base: 4, md: 0 }}>
+    <Flex direction="column" alignItems={{ base: 'center', md: 'flex-start' }}>
+      <Text fontSize={{ base: 'sm', md: 'lg' }} fontWeight="bold" mb={2}>
+        Upload Images:
       </Text>
-      <Link to={`/owner/my-apartments/${apartmentId}/room/${room.id}/contracts/${room.contract.id}`}>
-        <Button colorScheme="blue">Room Contract</Button>
-      </Link>
-    </Box>
-  ) : (
-    <Text>No contract available for this room.</Text>
-  )}
-
-  {renter ? (
-    <Box>
-      <Text>
-        <strong>Renter ID:</strong> {renter.id}
-      </Text>
-      <Text>
-        <strong>Renter name:</strong> {renter.first_name} {renter.last_name}
-      </Text>
-    </Box>
-  ) : (
-    <Text>No renter assigned to this room.</Text>
-  )}
-</VStack>
-      <HStack spacing={4} mt={6}>
-      <UpdateRoomForm room={room} apartmentId={apartmentId} onUpdate={(updatedRoom: Room) => setRoom(updatedRoom)} />
-        <DeleteRoom roomId={room.id} apartmentId={apartmentId} onDelete={handleRoomDelete} />
-        <AddContract roomId={room.id} apartmentId={apartmentId} onCreate={handleContractCreate} />
-        <Flex direction="column" alignItems="flex-start">
-          <Text fontSize="lg" fontWeight="bold" mb={2}>Upload Images:</Text>
-          <InputGroup>
+      <InputGroup>
         <Input type="file" accept="image/*" onChange={handleImageChange} />
         <InputRightElement>
           <IconButton aria-label="Upload" icon={<AddIcon />} />
         </InputRightElement>
       </InputGroup>
     </Flex>
+  </Box>
+</HStack>
 
-      </HStack>
+</Flex>
     </Box>
+    
   );
 };
 
