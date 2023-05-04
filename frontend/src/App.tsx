@@ -20,6 +20,10 @@ import BillsList from './components/Bill/BillsList';
 import SingleBill from './components/Bill/SingleBill';
 import OwnerSingleContract from './components/Contract/OwnerSingleContract';
 import OwnerSingleRoom from './components/Room/OwnerSingleRoom';
+import SearcherPage from './pages/Searcher/SearcherPage';
+import SearcherRoutes from './pages/Searcher/SearcherRoutes';
+import SearcherSearch from './components/Search/SearcherSearch';
+import SearcherResults from './components/Search/SearcherResults';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -54,6 +58,13 @@ function App() {
             <Route path="/owner/contracts/:id" element={<SingleContract />} />
 
             <Route path="/test" element={<MinimalExample />} />
+
+            <Route path="/searcher" element={<SearcherPage />} />
+            <Route path="/searcher/*" element={<SearcherRoutes />} />
+            <Route path="/searcher/search" element={<SearcherSearch />} />
+            <Route path="/searcher/searcherResults" element={<SearcherResults />} />
+
+
           </Routes>
         </Layout>
       </Router>
