@@ -1,4 +1,5 @@
 export interface CustomUser {
+  phone: number;
   id: number;
   username: string;
   email: string;
@@ -16,6 +17,10 @@ export interface CustomUser {
   export interface Apartment {
     id: number;
     owner: CustomUser;
+    owner_email: string;
+    owner_first_name: string;
+    owner_last_name: string;
+    owner_phone: string;
     address: string;
     description: string;
     size: string;
@@ -26,6 +31,7 @@ export interface CustomUser {
     images: ApartmentImage[];
     rooms?: Room[];
     ac: boolean;
+    
   }
   
   export interface ApartmentImage {

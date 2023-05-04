@@ -4,7 +4,7 @@ import MyRooms from "../../components/Room/MyRooms";
 import useFetchRooms from "../../components/Room/useFetchRooms";
 import SingleContract from "../../components/Contract/SingleContract";
 import MyContracts from "../../components/Contract/MyContracts";
-import SingleApartment from "../../components/Apartment/SingleApartment";
+import SingleApartment from "../../components/Apartment/OwnerSingleApartment";
 import OwnerSingleRoom from "../../components/Room/OwnerSingleRoom";
 import BillsList from "../../components/Bill/BillsList";
 import SingleBill from "../../components/Bill/SingleBill";

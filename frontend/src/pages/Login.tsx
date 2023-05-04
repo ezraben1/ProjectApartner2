@@ -34,6 +34,7 @@ function Login({ onLoginSuccess }: LoginProps) {
         if (userResponse.ok) {
           const user = await userResponse.json();
           setLoggedInUser(user);
+          
         }
   
         navigate("/");

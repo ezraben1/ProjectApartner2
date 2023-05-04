@@ -6,6 +6,7 @@ from uuid import uuid4
 from .validators import validate_file_size
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext as _
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CustomUser(AbstractUser):
@@ -28,6 +29,7 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    phone = PhoneNumberField(blank=True, null=True)
 
 
 class Apartment(models.Model):
@@ -187,6 +189,37 @@ class Bill(models.Model):
         return (
             f"{self.get_bill_type_display()} bill for {self.apartment} on {self.date}"
         )
+
+
+class Inquiry(models.Model):
+    INQUIRY_TYPE_CHOICES = [
+        ("defects", "Defects"),
+        ("questions", "Questions"),
+        ("payment", "Payment"),
+        ("problem", "Problem"),
+        ("other", "Other"),
+    ]
+    apartment = models.ForeignKey(
+        Apartment, on_delete=models.CASCADE, related_name="inquiries"
+    )
+    sender = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="sent_inquiries", null=True
+    )
+    receiver = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="received_inquiries",
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=20, choices=INQUIRY_TYPE_CHOICES)
+    message = models.TextField()
+
+    def __str__(self):
+        return f"Inquiry #{self.id} about {self.apartment.address}"
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class Review(models.Model):

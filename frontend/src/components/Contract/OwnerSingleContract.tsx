@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Contract } from '../../types';
-import { Box, Heading, VStack, Text, HStack, Button, StatGroup, StatLabel, StatNumber, Stat, Stack } from '@chakra-ui/react';
+import { Box, Heading, Button, StatGroup, StatLabel, StatNumber, Stat, Stack } from '@chakra-ui/react';
 import UpdateContractForm from './UpdateContractForm';
 import DeleteContract from './DeleteContract';
 import api from '../../utils/api';

@@ -9,7 +9,7 @@ import auth from '../utils/auth';
 
 interface HeaderProps {
   currentUser: any;
-  onLoginSuccess: (token?: string) => void;
+  onLoginSuccess: (token?: string) => Promise<void>; // Updated type
 }
 
 const Header: React.FC<HeaderProps> = ({ onLoginSuccess }) => {

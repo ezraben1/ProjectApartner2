@@ -4,6 +4,7 @@ from .models import (
     ApartmentImage,
     Contract,
     CustomUser,
+    Inquiry,
     Review,
     Room,
     RoomImage,
@@ -32,7 +33,8 @@ from django.conf import settings
 import os
 import mimetypes
 from django.http import FileResponse
-from django.http import JsonResponse
+from rest_framework import mixins, viewsets
+from django.db.models import Q
 
 
 class ApartmentImageViewSet(ModelViewSet):
@@ -257,9 +259,12 @@ class CustomUserViewSet(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if self.action == "patch":
+        if user.is_authenticated:
+            if self.action == "patch":
+                return CustomUser.objects.filter(id=user.id)
             return CustomUser.objects.filter(id=user.id)
-        return CustomUser.objects.all()
+        else:
+            return CustomUser.objects.none()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -440,3 +445,20 @@ class ReviewViewSet(ModelViewSet):
             return {"room_id": self.kwargs["room_pk"]}
         else:
             return {}
+
+
+class ApartmentInquiryViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    queryset = Inquiry.objects.all()
+    serializer_class = serializers.InquirySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return self.queryset.filter(Q(sender=user) | Q(receiver=user))
+
+    def perform_create(self, serializer):
+        apartment_id = self.kwargs.get("pk")
+        apartment = Apartment.objects.get(pk=apartment_id)
+        serializer.save(apartment=apartment, sender=self.request.user)

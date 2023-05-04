@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import (
     ApartmentImage,
+    Inquiry,
     Room,
     Apartment,
     RoomImage,
@@ -210,3 +211,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context["product_id"]
         return Review.objects.create(product_id=product_id, **validated_data)
+
+
+class InquirySerializer(serializers.ModelSerializer):
+    apartment = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Inquiry
+        fields = "__all__"
+        read_only_fields = ("apartment", "user")

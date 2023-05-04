@@ -7,8 +7,9 @@ import Main from './Main';
 interface LayoutProps {
   children: React.ReactNode;
   currentUser?: any;
-  onLoginSuccess: (token?: string) => void;
+  onLoginSuccess: (token?: string | undefined) => Promise<void>;
 }
+
 
 const Layout: React.FC<LayoutProps> = ({ children, currentUser, onLoginSuccess }) => {
   return (
