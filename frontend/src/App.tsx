@@ -22,6 +22,10 @@ import BillsList from './components/Bill/BillsList';
 import SingleBill from './components/Bill/SingleBill';
 import OwnerSingleContract from './components/Contract/OwnerSingleContract';
 import OwnerSingleRoom from './components/Room/OwnerSingleRoom';
+import SearcherPage from './pages/Searcher/SearcherPage';
+import SearcherRoutes from './pages/Searcher/SearcherRoutes';
+import SearcherSearch from './components/Search/SearcherSearch';
+import SearcherResults from './components/Search/SearcherResults';
 import ApartmentContracts from './components/Contract/ApartmentContracts';
 import { UserProvider } from './utils/UserContext';
 
@@ -31,8 +35,8 @@ function App() {
   const handleLoginSuccess = async (token: string | undefined): Promise<void> => {
     setCurrentUser(null);
   };
-  
-  
+
+
 
   return (
     <UserProvider>
@@ -65,6 +69,12 @@ function App() {
               <Route path="/renter/my-apartment/" element={<RenterSingleApartment />} />
 
               <Route path="/test" element={<MinimalExample />} />
+
+              <Route path="/searcher" element={<SearcherPage />} />
+              <Route path="/searcher/*" element={<SearcherRoutes />} />
+              <Route path="/searcher/search" element={<SearcherSearch />} />
+              <Route path="/searcher/searcherResults" element={<SearcherResults />} />
+
             </Routes>
           </Layout>
         </Router>
