@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home/HomePage";
 import Profile from "./pages/Profile";
@@ -11,19 +16,17 @@ import MinimalExample from "./pages/MinimalExample";
 import MyContracts from "./components/Contract/MyContracts";
 import OwnerSingleApartment from "./components/Apartment/OwnerSingleApartment";
 import RenterSingleApartment from "./components/Apartment/RenterSingleApartment";
+
+import SingleRoom from "./components/Room/OwnerSingleRoom";
 import SignUp from "./pages/SignUp";
 import { ChakraProvider } from "@chakra-ui/react";
 import PublicSingleRoom from "./components/Room/PublicSingleRoom";
-import BillsList from "./components/Bill/OwnerBillsList";
-import SingleBill from "./components/Bill/OwnerSingleBill";
+import BillsList from "./components/Bill/BillsList";
+import SingleBill from "./components/Bill/SingleBill";
 import OwnerSingleContract from "./components/Contract/OwnerSingleContract";
 import OwnerSingleRoom from "./components/Room/OwnerSingleRoom";
 import ApartmentContracts from "./components/Contract/ApartmentContracts";
 import { UserProvider } from "./utils/UserContext";
-import InquiryList from "./components/Inquiry/InquiryList";
-import SingleInquiry from "./components/Inquiry/SingleInquiry";
-import RenterBillList from "./components/Bill/RenterBillList";
-import RenterSingleBill from "./components/Bill/RetnerSingleBill";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -91,6 +94,14 @@ function App() {
               />
 
               <Route path="/test" element={<MinimalExample />} />
+
+              <Route path="/searcher" element={<SearcherPage />} />
+              <Route path="/searcher/*" element={<SearcherRoutes />} />
+              <Route path="/searcher/search" element={<SearcherSearch />} />
+              <Route
+                path="/searcher/searcherResults"
+                element={<SearcherResults />}
+              />
             </Routes>
           </Layout>
         </Router>
