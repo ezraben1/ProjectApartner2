@@ -16,17 +16,23 @@ import MinimalExample from "./pages/MinimalExample";
 import MyContracts from "./components/Contract/MyContracts";
 import OwnerSingleApartment from "./components/Apartment/OwnerSingleApartment";
 import RenterSingleApartment from "./components/Apartment/RenterSingleApartment";
-
-import SingleRoom from "./components/Room/OwnerSingleRoom";
 import SignUp from "./pages/SignUp";
 import { ChakraProvider } from "@chakra-ui/react";
 import PublicSingleRoom from "./components/Room/PublicSingleRoom";
-import BillsList from "./components/Bill/BillsList";
-import SingleBill from "./components/Bill/SingleBill";
 import OwnerSingleContract from "./components/Contract/OwnerSingleContract";
 import OwnerSingleRoom from "./components/Room/OwnerSingleRoom";
 import ApartmentContracts from "./components/Contract/ApartmentContracts";
 import { UserProvider } from "./utils/UserContext";
+import SingleInquiry from "./components/Inquiry/SingleInquiry";
+import InquiryList from "./components/Inquiry/InquiryList";
+import RenterBillList from "./components/Bill/RenterBillList";
+import RenterSingleBill from "./components/Bill/RetnerSingleBill";
+import SearcherPage from "./pages/Searcher/SearcherPage";
+import SearcherRoutes from "./pages/Searcher/SearcherRoutes";
+import SearcherSearch from "./components/Search/SearcherSearch";
+import SearcherResults from "./components/Search/SearcherResults";
+import OwnerBillsList from "./components/Bill/OwnerBillsList";
+import OwnerSingleBill from "./components/Bill/OwnerSingleBill";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -74,11 +80,11 @@ function App() {
               />
               <Route
                 path="/owner/my-apartments/:apartmentId/bills/"
-                element={<BillsList />}
+                element={<OwnerBillsList />}
               />
               <Route
                 path="/owner/my-apartments/:apartmentId/bills/:billId"
-                element={<SingleBill />}
+                element={<OwnerSingleBill />}
               />
               <Route path="/owner/my-rooms" element={<MyRooms />} />
               <Route path="/owner/my-contracts" element={<MyContracts />} />
