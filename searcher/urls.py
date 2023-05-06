@@ -5,21 +5,19 @@ from core.views import (
     ContractViewSet,
     CustomUserViewSet,
     ReviewViewSet,
-    RoomImageViewSet,
     RoomViewSet,
 )
-from searcher.views import SearcherApartmentViewSet
+from searcher.views import SearcherRoomViewSet
 
 app_name = "searcher"
 
 
 router = routers.DefaultRouter()
-router.register("searcher-search", SearcherApartmentViewSet, basename="search")
+router.register("searcher-search", SearcherRoomViewSet, basename="search")
 router.register("me", CustomUserViewSet, basename="me")
 
 rooms_router = routers.NestedSimpleRouter(router, "searcher-search", lookup="pk")
 rooms_router.register("reviews", ReviewViewSet, basename="room-reviews")
-rooms_router.register("images", RoomImageViewSet, basename="room-images")
 
 
 urlpatterns = [

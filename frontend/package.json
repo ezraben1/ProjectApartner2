@@ -18,12 +18,14 @@
     "bootstrap": "^5.2.3",
     "framer-motion": "^10.12.4",
     "js-cookie": "^3.0.4",
+    "normalize.css": "^8.0.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-image-gallery": "^1.2.11",
     "react-router-dom": "^6.10.0",
+    "use-debounce": "^9.0.4",
     "use-query-params": "^2.2.1"
   },
   "devDependencies": {

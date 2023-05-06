@@ -66,8 +66,6 @@ class ApartmentViewSet(ModelViewSet):
     queryset = Apartment.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = [
-        "address",
-        "description",
         "size",
         "balcony",
         "bbq_allowed",
@@ -75,6 +73,8 @@ class ApartmentViewSet(ModelViewSet):
         "allowed_pets",
         "ac",
     ]
+    search_fields = ["address", "description", "size"]
+    ordering_fields = ["price", "size"]
     permission_classes_by_action = {
         "create": [permissions.IsAuthenticated, IsApartmentOwner],
         "update": [permissions.IsAuthenticated, IsApartmentOwner],

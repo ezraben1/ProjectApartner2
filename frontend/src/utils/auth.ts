@@ -16,7 +16,7 @@ const auth = {
     }, {});
     
     const data = await response.json();
-    Cookies.set('access_token', data.access_token); // set the access_token in the cookies
+    Cookies.set('access_token', data.access_token); 
 
     return new Response(JSON.stringify(data), {
       status: response.status,
@@ -25,7 +25,6 @@ const auth = {
     });
   },
   logout: async (): Promise<void> => {
-    // Remove the access_token from both cookies and localStorage
     Cookies.remove('access_token');
     localStorage.removeItem('access_token');
     console.log('deleted')

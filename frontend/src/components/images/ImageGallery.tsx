@@ -1,71 +1,81 @@
-import React from 'react';
-import { Box, IconButton, Image } from '@chakra-ui/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { useDeleteImage } from './useDeleteImage';
+import React, { useState } from "react";
+import { Box, Flex, IconButton, Image } from "@chakra-ui/react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DeleteIcon,
+} from "@chakra-ui/icons";
 
 interface ImageGalleryProps {
-  images: any[];
-  endpointBuilder: (imageId: number) => string;
+  images: { id: number; image: string }[];
+  onDelete?: (imageId: number) => void;
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images, endpointBuilder }) => {
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
-  const { deleteImage } = useDeleteImage();
+const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onDelete }) => {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const handleImagePrev = () => {
+    setSelectedImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
 
   const handleImageNext = () => {
     setSelectedImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  const handleImagePrev = () => {
-    setSelectedImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
-
   const handleDeleteImage = (imageId: number) => {
-    const endpoint = endpointBuilder(imageId);
-    deleteImage(endpoint, (prev: any) => {
-      if (prev) {
-        return prev.filter((image: any) => image.id !== imageId);
-      }
-      return null;
-    });
+    onDelete && onDelete(imageId);
   };
 
   return (
-    <>
-      {images.map((image, index) => (
-        <Box
-          key={index}
-          borderRadius="sm"
-          overflow="hidden"
-          display={selectedImageIndex === index ? 'block' : 'none'}
-        >
-          <Image
-            src={image.image}
-            alt="Image"
-            objectFit="contain"
-            boxSize="lg"
-            onClick={() => handleDeleteImage(image.id)}
-            cursor="pointer"
+    <Flex align="center" justify="center" mb={4}>
+      {images && images.length > 0 && (
+        <>
+          <IconButton
+            aria-label="Previous image"
+            icon={<ChevronLeftIcon />}
+            onClick={handleImagePrev}
+            isDisabled={images.length <= 1}
+            colorScheme="gray"
+            variant="outline"
           />
-        </Box>
-      ))}
-      <IconButton
-        aria-label="Previous image"
-        icon={<ChevronLeftIcon />}
-        onClick={handleImagePrev}
-        isDisabled={images.length <= 1}
-        colorScheme="gray"
-        variant="outline"
-      />
-      <IconButton
-        aria-label="Next image"
-        icon={<ChevronRightIcon />}
-        onClick={handleImageNext}
-        isDisabled={images.length <= 1}
-        colorScheme="gray"
-        variant="outline"
-      />
-    </>
+          {images.map((image, index) => (
+            <Box
+              key={index}
+              borderRadius="sm"
+              overflow="hidden"
+              display={selectedImageIndex === index ? "block" : "none"}
+            >
+              <Image
+                src={image.image}
+                alt={`Room image ${index}`}
+                objectFit="contain"
+                boxSize={{ base: "350px", md: "lg", lg: "xl" }}
+              />
+            </Box>
+          ))}
+          <IconButton
+            aria-label="Next image"
+            icon={<ChevronRightIcon />}
+            onClick={handleImageNext}
+            isDisabled={images.length <= 1}
+            colorScheme="gray"
+            variant="outline"
+          />
+          {onDelete && (
+            <IconButton
+              aria-label="Delete image"
+              icon={<DeleteIcon />}
+              onClick={() => handleDeleteImage(images[selectedImageIndex].id)}
+              colorScheme="red"
+              variant="outline"
+              ml={2}
+            />
+          )}
+        </>
+      )}
+    </Flex>
   );
 };
 

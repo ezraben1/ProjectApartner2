@@ -64,24 +64,6 @@ nav a {
   margin-right: var(--spacing-medium);
 }
 
-
-body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 100vw;
-  min-height: 100vh;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-
 .content {
   flex-grow: 1;
 }

@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home/HomePage";
 import Profile from "./pages/Profile";
@@ -33,6 +28,7 @@ import SearcherSearch from "./components/Search/SearcherSearch";
 import SearcherResults from "./components/Search/SearcherResults";
 import OwnerBillsList from "./components/Bill/OwnerBillsList";
 import OwnerSingleBill from "./components/Bill/OwnerSingleBill";
+import SearcherSingleRoom from "./components/Room/SearcherSingleRoom";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -104,6 +100,11 @@ function App() {
               <Route path="/searcher" element={<SearcherPage />} />
               <Route path="/searcher/*" element={<SearcherRoutes />} />
               <Route path="/searcher/search" element={<SearcherSearch />} />
+              <Route
+                path="/searcher/searcher-search/:roomId"
+                element={<SearcherSingleRoom />}
+              />
+
               <Route
                 path="/searcher/searcherResults"
                 element={<SearcherResults />}
