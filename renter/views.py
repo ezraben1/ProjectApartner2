@@ -1,4 +1,7 @@
-from django.http import Http404
+import mimetypes
+import os
+from django.conf import settings
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from core.permissions import IsAuthenticated, IsRoomRenter
@@ -7,7 +10,6 @@ from rest_framework.response import Response
 from core.serializers import (
     BillSerializer,
     ContractSerializer,
-    InquirySerializer,
     ReviewSerializer,
     RoomSerializer,
 )
@@ -22,8 +24,8 @@ from rest_framework import permissions, status
 from django.core.mail import send_mail
 
 from renter.serializers import RenterApartmentSerializer
-
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 
 
@@ -38,14 +40,9 @@ class RenterApartmentViewSet(viewsets.ReadOnlyModelViewSet):
         return apartment
 
     def get_queryset(self):
-        apartment = self.get_apartment()
-        return (
-            Apartment.objects.filter(id=apartment.id)
-            if apartment
-            else Apartment.objects.none()
-        )
+        return Apartment.objects.none()
 
-    def retrieve(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         apartment = self.get_apartment()
         if apartment:
             serializer = self.get_serializer(apartment)
@@ -96,6 +93,7 @@ class RenterRoomViewSet(viewsets.ReadOnlyModelViewSet):
 class RenterBillViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BillSerializer
     permission_classes = [permissions.IsAuthenticated, IsRoomRenter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
 
     def get_queryset(self):
         user = self.request.user
@@ -115,6 +113,27 @@ class RenterBillViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({"status": "success"})
         return Response(
             {"status": "error", "message": "This bill has already been paid."}
+        )
+
+    @action(
+        detail=False, methods=["get"], url_path=r"my-bills/(?P<bill_id>\d+)/download"
+    )
+    def download(self, request, bill_id=None):
+        bill = get_object_or_404(Bill, id=bill_id)
+        file_path = os.path.join(settings.MEDIA_ROOT, str(bill.file))
+        if os.path.exists(file_path):
+            content_type, encoding = mimetypes.guess_type(file_path)
+            content_type = content_type or "application/octet-stream"
+            with open(file_path, "rb") as fh:
+                response = HttpResponse(fh.read(), content_type=content_type)
+                response[
+                    "Content-Disposition"
+                ] = f"attachment; filename={os.path.basename(file_path)}"
+                if encoding:
+                    response["Content-Encoding"] = encoding
+                return response
+        return Response(
+            {"message": "File not found."}, status=status.HTTP_404_NOT_FOUND
         )
 
 

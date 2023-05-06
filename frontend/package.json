@@ -23,7 +23,8 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-image-gallery": "^1.2.11",
-    "react-router-dom": "^6.10.0"
+    "react-router-dom": "^6.10.0",
+    "use-query-params": "^2.2.1"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.3",

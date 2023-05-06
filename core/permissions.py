@@ -49,8 +49,11 @@ class IsRoomRenter(BasePermission):
         if request.user.is_authenticated and request.user.user_type == "renter":
             if isinstance(obj, Bill):
                 # Check if the user is the renter of a room in the apartment
-                room_renter = obj.room.renter == request.user
-                if room_renter:
+                apartment = obj.apartment
+                rented_rooms_in_apartment = request.user.rooms_rented.filter(
+                    apartment=apartment
+                )
+                if rented_rooms_in_apartment.exists():
                     return True
             elif isinstance(obj, Contract):
                 # Check if the user is the renter of the room in the contract

@@ -5,6 +5,7 @@ from .models import (
     Contract,
     CustomUser,
     Inquiry,
+    InquiryReply,
     Review,
     Room,
     RoomImage,
@@ -35,6 +36,7 @@ import mimetypes
 from django.http import FileResponse
 from rest_framework import mixins, viewsets
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ApartmentImageViewSet(ModelViewSet):
@@ -456,9 +458,78 @@ class ApartmentInquiryViewSet(
 
     def get_queryset(self):
         user = self.request.user
+        apartment = self.get_user_apartment(user)
+        if apartment:
+            return self.queryset.filter(
+                Q(apartment=apartment) & (Q(sender=user) | Q(receiver=user))
+            )
+        else:
+            return Inquiry.objects.none()
+
+    def perform_create(self, serializer):
+        apartment = self.get_user_apartment(self.request.user)
+        if not apartment:
+            print("Apartment not found for the user")
+            return Response({"detail": "Apartment not found for the user."}, status=404)
+
+        receiver = apartment.owner
+
+        if serializer.is_valid():
+            print("Serializer is valid")
+            inquiry = serializer.save(
+                apartment=apartment, sender=self.request.user, receiver=receiver
+            )
+            print("Inquiry created:", inquiry)
+            # Return a successful response with the created Inquiry data
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print("Serializer is invalid:", serializer.errors)
+        return Response(serializer.errors, status=400)
+
+    def get_user_apartment(self, user):
+        room = Room.objects.filter(renter=user).first()
+        return room.apartment if room else None
+
+
+class UserInquiryViewSet(viewsets.ModelViewSet):
+    queryset = Inquiry.objects.all()
+    serializer_class = serializers.InquirySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
         return self.queryset.filter(Q(sender=user) | Q(receiver=user))
 
     def perform_create(self, serializer):
-        apartment_id = self.kwargs.get("pk")
-        apartment = Apartment.objects.get(pk=apartment_id)
-        serializer.save(apartment=apartment, sender=self.request.user)
+        serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def close(self, request, pk=None):
+        inquiry = self.get_object()
+
+        if request.user.user_type != "owner":
+            return Response(
+                {"detail": "Only owner users can close inquiries."}, status=403
+            )
+
+        inquiry.status = Inquiry.InquiryStatus.CLOSED
+        inquiry.save()
+        serializer = self.get_serializer(inquiry)
+        return Response(serializer.data)
+
+
+class InquiryReplyViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    queryset = InquiryReply.objects.all()
+    serializer_class = serializers.InquiryReplySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        inquiry_id = self.kwargs.get("pk")
+        return InquiryReply.objects.filter(inquiry__id=inquiry_id)
+
+    def perform_create(self, serializer):
+        inquiry_id = self.kwargs.get("pk")
+        inquiry = Inquiry.objects.get(pk=inquiry_id)
+        serializer.save(inquiry=inquiry, sender=self.request.user)

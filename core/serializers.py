@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import (
     ApartmentImage,
     Inquiry,
+    InquiryReply,
     Room,
     Apartment,
     RoomImage,
@@ -213,11 +214,38 @@ class ReviewSerializer(serializers.ModelSerializer):
         return Review.objects.create(product_id=product_id, **validated_data)
 
 
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["id", "first_name", "last_name"]
+
+
 class InquirySerializer(serializers.ModelSerializer):
-    apartment = serializers.PrimaryKeyRelatedField(read_only=True)
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    sender = SimpleUserSerializer(read_only=True)
+    receiver = SimpleUserSerializer(read_only=True)
+    apartment = ApartmentSerializer(read_only=True)
+    status = serializers.ChoiceField(choices=Inquiry.InquiryStatus.choices)
 
     class Meta:
         model = Inquiry
-        fields = "__all__"
-        read_only_fields = ("apartment", "user")
+        fields = [
+            "id",
+            "apartment",
+            "sender",
+            "receiver",
+            "type",
+            "message",
+            "created_at",
+            "status",
+            "image",
+        ]
+
+
+class InquiryReplySerializer(serializers.ModelSerializer):
+    sender = SimpleUserSerializer(read_only=True)
+    apartment = ApartmentSerializer(read_only=True)
+    room = RoomSerializer(read_only=True)
+
+    class Meta:
+        model = InquiryReply
+        fields = ["id", "message", "sender", "apartment", "room", "created_at"]

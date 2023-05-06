@@ -16,7 +16,9 @@ const ApartmentContracts: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const { search } = useLocation();
   const { apartmentId, roomId } = queryString.parse(search) as RouteParams;
-  const [contractData, status] = useAuthorizedData<Contract[]>(`/owner/owner-apartments/${apartmentId}/contracts/`);
+  const [contractData, status] = useAuthorizedData<Contract[]>(
+    `/owner/owner-apartments/${apartmentId}/contracts/`
+  );
 
   useEffect(() => {
     if (status === "idle" && contractData) {
@@ -29,32 +31,38 @@ const ApartmentContracts: React.FC = () => {
       prevContracts.filter((contract) => contract.id !== deletedContract.id)
     );
   };
-  
 
   return (
     <Box>
       <Heading mb={4}>Apartment {apartmentId} Contracts</Heading>
-      <VStack spacing={4} align="start">
-        {contracts.map((contract: Contract) => (
-          <Box key={contract.id} borderWidth={1} borderRadius="md" p={4}>
-            <Link as={RouterLink} to={`/owner/my-apartments/${contract.apartment_id}/room/${contract.room_id}/contracts/${contract.id}`}>
-              <HStack spacing={4}>
-                <Text>Contract #{contract.id}</Text>
-                <Text>Start Date: {contract.start_date}</Text>
-                <Text>End Date: {contract.end_date}</Text>
-                <Text>Deposit Amount: {contract.deposit_amount}</Text>
-                <Text>Rent Amount: {contract.rent_amount}</Text>
-              </HStack>
-            </Link>
-            <DeleteContract
-              contract={contract}
-              onDelete={handleContractDelete}
-              apartmentId={apartmentId}
-              roomId={contract.room_id.toString()}
-            />
-          </Box>
-        ))}
-      </VStack>
+      {contracts.length > 0 ? (
+        <VStack spacing={4} align="start">
+          {contracts.map((contract: Contract) => (
+            <Box key={contract.id} borderWidth={1} borderRadius="md" p={4}>
+              <Link
+                as={RouterLink}
+                to={`/owner/my-apartments/${contract.apartment_id}/room/${contract.room_id}/contracts/${contract.id}`}
+              >
+                <HStack spacing={4}>
+                  <Text>Contract #{contract.id}</Text>
+                  <Text>Start Date: {contract.start_date}</Text>
+                  <Text>End Date: {contract.end_date}</Text>
+                  <Text>Deposit Amount: {contract.deposit_amount}</Text>
+                  <Text>Rent Amount: {contract.rent_amount}</Text>
+                </HStack>
+              </Link>
+              <DeleteContract
+                contract={contract}
+                onDelete={handleContractDelete}
+                apartmentId={apartmentId}
+                roomId={contract.room_id.toString()}
+              />
+            </Box>
+          ))}
+        </VStack>
+      ) : (
+        <Box>No contracts found for this apartment.</Box>
+      )}
     </Box>
   );
 };

@@ -1,18 +1,31 @@
-import { useEffect, useState } from 'react';
-import { Contract } from '../../types';
-import { useAuthorizedData } from '../../utils/useAuthorizedData';
-import { Box, Heading, Text, VStack, Link, List, ListItem } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Contract } from "../../types";
+import { useAuthorizedData } from "../../utils/useAuthorizedData";
+import {
+  Box,
+  Heading,
+  Text,
+  VStack,
+  Link,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 
 const MyContracts: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [contractData, status] = useAuthorizedData<Contract[]>('/owner/owner-contarcts/');
+  const [contractData, status] = useAuthorizedData<Contract[]>(
+    "/owner/owner-contarcts/"
+  );
 
   useEffect(() => {
-    if (status === 'idle' && contractData) {
+    if (status === "idle" && contractData) {
       setContracts(contractData);
     }
   }, [contractData, status]);
+  if (status === "error" || !contracts || contracts.length === 0) {
+    return <Text>No contracts found.</Text>;
+  }
 
   return (
     <Box>
@@ -22,7 +35,10 @@ const MyContracts: React.FC = () => {
       <List spacing={4}>
         {contracts.map((contract: Contract) => (
           <ListItem key={contract.id} borderWidth={1} borderRadius="lg" p={4}>
-              <Link as={RouterLink} to={`/owner/my-apartments/${contract.apartment_id}/room/${contract.room_id}/contracts/${contract.id}`}>
+            <Link
+              as={RouterLink}
+              to={`/owner/my-apartments/${contract.apartment_id}/room/${contract.room_id}/contracts/${contract.id}`}
+            >
               <VStack align="start" spacing={2}>
                 <Heading as="h2" size="lg">
                   Contract #{contract.id}

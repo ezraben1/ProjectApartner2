@@ -20,23 +20,13 @@ router.register("me", CustomUserViewSet, basename="me")
 router.register("my-room", RenterRoomViewSet, basename="my-room")
 router.register("my-apartment", RenterApartmentViewSet, basename="my-aprtment")
 router.register("my-bills", RenterBillViewSet, basename="my-bills")
-router.register("my-inquiries", ApartmentInquiryViewSet, basename="my-bills")
 
 
 urlpatterns = [
     path(
-        "my-apartment/<int:pk>/inquiries/",
+        "my-apartment/inquiries/",
         ApartmentInquiryViewSet.as_view({"get": "list", "post": "create"}),
         name="renter-inquiries",
-    ),
-    path(
-        "my-apartment/<int:apartment_id>/inquiries/send_inquiry/",
-        ApartmentInquiryViewSet.as_view(
-            {
-                "post": "create",
-            }
-        ),
-        name="contract_detail",
     ),
     path(
         "my-room/<int:room_id>/contracts/<int:pk>/",
@@ -56,5 +46,10 @@ urlpatterns = [
         "renter-search/<int:room_id>/review/<int:pk>/",
         ReviewViewSet.as_view({"get": "retrieve"}),
         name="review-detail",
+    ),
+    path(
+        "my-bills/<int:bill_id>/download/",
+        RenterBillViewSet.as_view({"get": "download"}),
+        name="bill-download-file",
     ),
 ] + router.urls

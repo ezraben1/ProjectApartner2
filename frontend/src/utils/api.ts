@@ -40,6 +40,31 @@ const post = async (url: string, data: any): Promise<Response> => {
     headers,
   });
 };
+const postWithFormData = async (
+  url: string,
+  formData: FormData
+): Promise<Response> => {
+  const response = await api.request({
+    url,
+    method: "POST",
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  const headers: HeadersInit = Object.entries(response.headers).reduce(
+    (acc: { [key: string]: string }, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    },
+    {}
+  );
+
+  return new Response(JSON.stringify(response.data), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+};
 
 const getUserDetails = async (): Promise<Response> => {
   const response = await api.get('/core/me/');
@@ -149,6 +174,7 @@ export default {
   patch,
   remove,
   put,
-  getBlob
+  getBlob,
+  postWithFormData 
 };
 

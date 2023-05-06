@@ -6,6 +6,7 @@ const RenterRoutes = () => {
   return (
     <Routes>
       <Route path="/renter/my-apartment/" element={<RenterSingleApartment />} />
+
       {/* <Route path="/renter/me" element={<RenterMe />} />
       <Route path="/renter/my-apartment/" element={<RenterSingleApartment />} />
       <Route path="/renter/my-bills" element={<RenterMyBills />} />

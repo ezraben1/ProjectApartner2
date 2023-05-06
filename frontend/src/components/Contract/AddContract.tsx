@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Apartment, Contract } from '../../types';
+import React, { useState } from "react";
+import { Apartment, Contract } from "../../types";
 import {
   Button,
   Modal,
@@ -13,8 +13,8 @@ import {
   FormLabel,
   Input,
   useDisclosure,
-} from '@chakra-ui/react';
-import api from '../../utils/api';
+} from "@chakra-ui/react";
+import api from "../../utils/api";
 
 interface AddContractProps {
   onCreate: (createdContract: Contract) => void;
@@ -22,7 +22,11 @@ interface AddContractProps {
   apartmentId: number | Apartment;
 }
 
-const AddContract: React.FC<AddContractProps> = ({ roomId, apartmentId, onCreate }) => {
+const AddContract: React.FC<AddContractProps> = ({
+  roomId,
+  apartmentId,
+  onCreate,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newContract, setNewContract] = useState<Partial<Contract>>({});
 
@@ -34,17 +38,20 @@ const AddContract: React.FC<AddContractProps> = ({ roomId, apartmentId, onCreate
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post(`/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/`, newContract);
+      const response = await api.post(
+        `/owner/owner-apartments/${apartmentId}/room/${roomId}/contracts/`,
+        newContract
+      );
 
       if (response.status === 201) {
         const createdData = await response.json();
         onCreate(createdData);
         onClose();
       } else {
-        throw new Error('Error creating contract');
+        throw new Error("Error creating contract");
       }
     } catch (error) {
-      console.error('Error creating contract:', error);
+      console.error("Error creating contract:", error);
     }
   };
 
@@ -70,7 +77,11 @@ const AddContract: React.FC<AddContractProps> = ({ roomId, apartmentId, onCreate
             </FormControl>
             <FormControl id="deposit_amount">
               <FormLabel>Deposit Amount</FormLabel>
-              <Input type="number" name="deposit_amount" onChange={handleChange} />
+              <Input
+                type="number"
+                name="deposit_amount"
+                onChange={handleChange}
+              />
             </FormControl>
             <FormControl id="rent_amount">
               <FormLabel>Rent Amount</FormLabel>

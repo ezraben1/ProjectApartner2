@@ -21,7 +21,7 @@ router.register("owner-bills", BillViewSet, basename="bills")
 urlpatterns = [
     path(
         "owner-apartments/<int:pk>/upload_image/",
-        views.ApartmentViewSet.as_view({"patch": "upload_image"}),
+        views.OwnerApartmentViewSet.as_view({"patch": "upload_image"}),
         name="apartment-upload-image",
     ),
     path(

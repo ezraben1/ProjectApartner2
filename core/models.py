@@ -192,6 +192,15 @@ class Bill(models.Model):
 
 
 class Inquiry(models.Model):
+    class InquiryStatus(models.TextChoices):
+        OPEN = "open", "Open"
+        CLOSED = "closed", "Closed"
+
+    status = models.CharField(
+        max_length=10,
+        choices=InquiryStatus.choices,
+        default=InquiryStatus.OPEN,
+    )
     INQUIRY_TYPE_CHOICES = [
         ("defects", "Defects"),
         ("questions", "Questions"),
@@ -214,9 +223,27 @@ class Inquiry(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=20, choices=INQUIRY_TYPE_CHOICES)
     message = models.TextField()
+    image = models.ImageField(upload_to="inquiry/", blank=True, null=True)
 
     def __str__(self):
         return f"Inquiry #{self.id} about {self.apartment.address}"
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class InquiryReply(models.Model):
+    inquiry = models.ForeignKey(
+        Inquiry, on_delete=models.CASCADE, related_name="replies"
+    )
+    sender = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="sent_replies"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+
+    def __str__(self):
+        return f"Reply #{self.id} to Inquiry #{self.inquiry.id}"
 
     class Meta:
         ordering = ["-created_at"]
