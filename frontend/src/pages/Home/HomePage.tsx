@@ -59,8 +59,11 @@ const HomePage: React.FC<HomeProps> = ({}) => {
               </AspectRatio>
               <Card.Body>
                 <Card.Title>
-                  {room.apartment?.address || "No address available"}
+                  {room.city && room.street && room.building_number
+                    ? `${room.city}, ${room.street}`
+                    : "No address available"}
                 </Card.Title>
+
                 <Card.Text>
                   <strong>Description:</strong> {room.description}
                 </Card.Text>

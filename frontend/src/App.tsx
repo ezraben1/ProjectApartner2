@@ -19,16 +19,16 @@ import OwnerSingleRoom from "./components/Room/OwnerSingleRoom";
 import ApartmentContracts from "./components/Contract/ApartmentContracts";
 import { UserProvider } from "./utils/UserContext";
 import SingleInquiry from "./components/Inquiry/SingleInquiry";
-import InquiryList from "./components/Inquiry/InquiryList";
 import RenterBillList from "./components/Bill/RenterBillList";
 import RenterSingleBill from "./components/Bill/RetnerSingleBill";
 import SearcherPage from "./pages/Searcher/SearcherPage";
 import SearcherRoutes from "./pages/Searcher/SearcherRoutes";
 import SearcherSearch from "./components/Search/SearcherSearch";
-import SearcherResults from "./components/Search/SearcherResults";
 import OwnerBillsList from "./components/Bill/OwnerBillsList";
 import OwnerSingleBill from "./components/Bill/OwnerSingleBill";
 import SearcherSingleRoom from "./components/Room/SearcherSingleRoom";
+import InquirySearch from "./components/Inquiry/InquirySearch";
+import SearcherSingleContract from "./components/Contract/SearcherSingleContract";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -51,7 +51,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/me" element={<Profile />} />
 
-              <Route path="/inquiries" element={<InquiryList />} />
+              <Route path="/inquiries" element={<InquirySearch />} />
               <Route path="/inquiries/:id" element={<SingleInquiry />} />
 
               <Route path="/home/:id" element={<PublicSingleRoom />} />
@@ -104,10 +104,9 @@ function App() {
                 path="/searcher/searcher-search/:roomId"
                 element={<SearcherSingleRoom />}
               />
-
               <Route
-                path="/searcher/searcherResults"
-                element={<SearcherResults />}
+                path="/searcher/searcher-search/:roomId/contracts"
+                element={<SearcherSingleContract />}
               />
             </Routes>
           </Layout>

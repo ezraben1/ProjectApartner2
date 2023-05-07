@@ -73,7 +73,15 @@ class ApartmentViewSet(ModelViewSet):
         "allowed_pets",
         "ac",
     ]
-    search_fields = ["address", "description", "size"]
+    search_fields = [
+        "city",
+        "street",
+        "building_number",
+        "apartment_number",
+        "floor",
+        "description",
+        "size",
+    ]
     ordering_fields = ["price", "size"]
     permission_classes_by_action = {
         "create": [permissions.IsAuthenticated, IsApartmentOwner],
@@ -138,7 +146,14 @@ class PublicRoomViewSet(ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = RoomFilter
     pagination_class = DefaultPagination
-    search_fields = ["address", "size"]
+    search_fields = [
+        "apartment__city",
+        "apartment__street",
+        "apartment__building_number",
+        "apartment__apartment_number",
+        "apartment__floor",
+        "size",
+    ]
     ordering_fields = ["price_per_month"]
     permission_classes = [permissions.AllowAny]
 
@@ -151,7 +166,14 @@ class RoomViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = RoomFilter
     pagination_class = DefaultPagination
-    search_fields = ["address", "size"]
+    search_fields = [
+        "apartment__city",
+        "apartment__street",
+        "apartment__building_number",
+        "apartment__apartment_number",
+        "apartment__floor",
+        "size",
+    ]
     ordering_fields = ["price_per_month"]
 
     def get_permissions(self):
@@ -228,15 +250,6 @@ class RoomViewSet(ModelViewSet):
         self.check_object_permissions(request, contract)
         contract.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(detail=True, methods=["post"], url_path="contact-owner")
-    def contact_owner(self, request, pk=None):
-        room = self.get_object()
-        owner = room.apartment.owner
-        subject = f"Inquiry about {room.address}"
-        message = f"Hi {owner.first_name},\n\nI am interested in renting your room at {room.address}. Please let me know if it's still available and if I can come by for a visit.\n\nThanks,\n{request.user.first_name}"
-        send_mail(subject, message, [owner.email])
-        return Response({"message": "Email sent to owner."})
 
     @action(detail=True, methods=["post"])
     def sign_contract(self, request, pk=None):
@@ -458,16 +471,23 @@ class ApartmentInquiryViewSet(
 
     def get_queryset(self):
         user = self.request.user
-        apartment = self.get_user_apartment(user)
+        pk = self.kwargs.get("pk", None)
+        is_room = self.request.query_params.get("is_room", "false").lower() == "true"
+        apartment = self.get_user_apartment(user, pk, is_room)
         if apartment:
             return self.queryset.filter(
                 Q(apartment=apartment) & (Q(sender=user) | Q(receiver=user))
             )
+        elif is_room:
+            return self.queryset.filter(room__renter=user)
         else:
             return Inquiry.objects.none()
 
     def perform_create(self, serializer):
-        apartment = self.get_user_apartment(self.request.user)
+        is_room = self.request.query_params.get("is_room", "false").lower() == "true"
+        pk = self.kwargs.get("pk", None)
+        apartment = self.get_user_apartment(self.request.user, pk, is_room)
+
         if not apartment:
             print("Apartment not found for the user")
             return Response({"detail": "Apartment not found for the user."}, status=404)
@@ -484,17 +504,45 @@ class ApartmentInquiryViewSet(
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             print("Serializer is invalid:", serializer.errors)
+
         return Response(serializer.errors, status=400)
 
-    def get_user_apartment(self, user):
-        room = Room.objects.filter(renter=user).first()
-        return room.apartment if room else None
+    def get_user_apartment(self, user, pk=None, is_room=False):
+        if pk:
+            if is_room:
+                room = Room.objects.filter(pk=pk).first()
+                return room.apartment if room else None
+            else:
+                return Apartment.objects.filter(pk=pk).first()
+        else:
+            room = Room.objects.filter(renter=user).first()
+            return room.apartment if room else None
 
 
 class UserInquiryViewSet(viewsets.ModelViewSet):
     queryset = Inquiry.objects.all()
     serializer_class = serializers.InquirySerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    pagination_class = DefaultPagination
+
+    filterset_fields = [
+        "status",
+        "type",
+        "apartment",
+        "sender",
+        "receiver",
+    ]
+    search_fields = [
+        "message",
+        "apartment__city",  # Example of how to use search_fields with a ForeignKey field
+        "apartment__street",
+        "apartment__building_number",
+        "apartment__apartment_number",
+        "sender__username",  # Example of how to use search_fields with a related model
+        "receiver__username",
+    ]
+    ordering_fields = ["created_at"]
 
     def get_queryset(self):
         user = self.request.user

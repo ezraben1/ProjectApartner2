@@ -37,6 +37,8 @@ const InquiryForm: React.FC<InquiryFormProps> = ({
       formData.append("message", message);
       formData.append("type", type);
       formData.append("sender", sender.toString());
+      console.log("receiver_id:", receiver_id); // Add this line to log receiver_id
+
       formData.append("receiver_id", receiver_id.toString());
       formData.append("status", "open");
 

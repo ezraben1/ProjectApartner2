@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { Container, Card, ListGroup, ListGroupItem } from "react-bootstrap";
 
 const SingleContract: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { roomId } = useParams();
   const [contract, setContract] = useState<Contract | null>(null);
   const [contractData, status] = useAuthorizedData<Contract>(
-    `owner/owner-contarcts/${id}/`
+    `/searcher/searcher-search/${roomId}/contracts/`
   );
 
   useEffect(() => {

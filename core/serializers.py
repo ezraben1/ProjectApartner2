@@ -28,6 +28,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "avatar",
+            "age",
+            "gender",
+            "bio",
+            "preferred_location",
+            "preferred_roommates",
+            "preferred_rent",
         )
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -83,6 +89,7 @@ class ApartmentImageSerializer(serializers.ModelSerializer):
 
 class ApartmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.email")
+    owner_id = serializers.ReadOnlyField(source="owner.id")
     rooms = serializers.SerializerMethodField()
     bill_ids = serializers.SerializerMethodField()
     images = ApartmentImageSerializer(many=True, read_only=True)
@@ -102,7 +109,13 @@ class ApartmentSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "owner",
+            "owner_id",
             "address",
+            "city",
+            "street",
+            "building_number",
+            "apartment_number",
+            "floor",
             "description",
             "size",
             "balcony",
@@ -158,6 +171,11 @@ class RoomSerializer(serializers.ModelSerializer):
     renter_search = serializers.CharField(
         required=False, allow_blank=True, write_only=True
     )
+    city = serializers.ReadOnlyField(source="apartment.city")
+    street = serializers.ReadOnlyField(source="apartment.street")
+    building_number = serializers.ReadOnlyField(source="apartment.building_number")
+    apartment_number = serializers.ReadOnlyField(source="apartment.apartment_number")
+    floor = serializers.ReadOnlyField(source="apartment.floor")
 
     def to_representation(self, instance):
         if self.context.get("nested"):
@@ -173,10 +191,15 @@ class RoomSerializer(serializers.ModelSerializer):
             "price_per_month",
             "window",
             "images",
-            "apartment_id",
             "contract",
             "renter",
+            "apartment_id",
             "apartment",
+            "city",
+            "street",
+            "building_number",
+            "apartment_number",
+            "floor",
             "images",
             "renter_search",
         ]
@@ -225,12 +248,14 @@ class InquirySerializer(serializers.ModelSerializer):
     receiver = SimpleUserSerializer(read_only=True)
     apartment = ApartmentSerializer(read_only=True)
     status = serializers.ChoiceField(choices=Inquiry.InquiryStatus.choices)
+    apartment_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Inquiry
         fields = [
             "id",
             "apartment",
+            "apartment_address",
             "sender",
             "receiver",
             "type",
@@ -239,6 +264,9 @@ class InquirySerializer(serializers.ModelSerializer):
             "status",
             "image",
         ]
+
+    def get_apartment_address(self, obj):
+        return obj.apartment.address
 
 
 class InquiryReplySerializer(serializers.ModelSerializer):

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   FormControl,
@@ -15,9 +15,9 @@ import {
   ModalFooter,
   useDisclosure,
   Checkbox,
-} from '@chakra-ui/react';
-import api from '../../utils/api';
-import { Apartment } from '../../types';
+} from "@chakra-ui/react";
+import api from "../../utils/api";
+import { Apartment } from "../../types";
 
 interface UpdateApartmentFormProps {
   apartment: Apartment;
@@ -26,25 +26,38 @@ interface UpdateApartmentFormProps {
 
 const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
   apartment,
-  onUpdate,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [address, setAddress] = useState(apartment.address);
+  const [city, setCity] = useState(apartment.city);
+  const [street, setStreet] = useState(apartment.street);
+  const [buildingNumber, setBuildingNumber] = useState(
+    apartment.building_number
+  );
+  const [apartmentNumber, setApartmentNumber] = useState(
+    apartment.apartment_number
+  );
+  const [floor, setFloor] = useState(apartment.floor);
   const [description, setDescription] = useState(apartment.description);
   const [size, setSize] = useState(apartment.size);
   const [balcony, setBalcony] = useState(!!apartment.balcony);
   const [bbqAllowed, setBbqAllowed] = useState(apartment.bbq_allowed);
-  const [smokingAllowed, setSmokingAllowed] = useState(apartment.smoking_allowed);
+  const [smokingAllowed, setSmokingAllowed] = useState(
+    apartment.smoking_allowed
+  );
   const [allowedPets, setAllowedPets] = useState(apartment.allowed_pets);
   const [ac, setAc] = useState(apartment.ac);
-  
+
   const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await api.patch(`/owner/owner-apartments/${apartment.id}/`, {
-        address,
+        city,
+        street,
+        building_number: buildingNumber,
+        apartment_number: apartmentNumber,
+        floor,
         description,
         size,
         balcony,
@@ -53,34 +66,38 @@ const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
         allowed_pets: allowedPets,
         ac,
       });
-
-      setAddress('');
-      setDescription('');
-      setSize('');
+      setCity("");
+      setStreet("");
+      setBuildingNumber("");
+      setApartmentNumber("");
+      setFloor("");
+      setDescription("");
+      setSize("");
       setBalcony(false);
       setBbqAllowed(false);
       setSmokingAllowed(false);
       setAllowedPets(false);
       setAc(false);
-      
+
       toast({
-        title: 'Apartment updated.',
-        description: 'The apartment has been updated successfully.',
-        status: 'success',
+        title: "Apartment updated.",
+        description: "The apartment has been updated successfully.",
+        status: "success",
         duration: 5000,
         isClosable: true,
       });
     } catch (error) {
-      console.error('Error updating apartment:', error);
+      console.error("Error updating apartment:", error);
 
       if (error && (error as any).response && (error as any).response.data) {
-        console.error('Server error message:', (error as any).response.data);
+        console.error("Server error message:", (error as any).response.data);
       }
 
       toast({
-        title: 'Error updating apartment.',
-        description: 'There was an error updating the apartment. Please try again later.',
-        status: 'error',
+        title: "Error updating apartment.",
+        description:
+          "There was an error updating the apartment. Please try again later.",
+        status: "error",
         duration: 5000,
         isClosable: true,
       });
@@ -100,13 +117,49 @@ const UpdateApartmentForm: React.FC<UpdateApartmentFormProps> = ({
           <ModalHeader>Update Apartment</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl id="address">
-              <FormLabel>Address</FormLabel>
+            <FormControl>
+              <FormLabel>City</FormLabel>
               <Input
                 type="text"
-                placeholder="Enter address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Street</FormLabel>
+              <Input
+                type="text"
+                placeholder="Enter street"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Building Number</FormLabel>
+              <Input
+                type="text"
+                placeholder="Enter building number"
+                value={buildingNumber}
+                onChange={(e) => setBuildingNumber(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Apartment Number</FormLabel>
+              <Input
+                type="text"
+                placeholder="Enter apartment number"
+                value={apartmentNumber}
+                onChange={(e) => setApartmentNumber(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Floor</FormLabel>
+              <Input
+                type="text"
+                placeholder="Enter floor"
+                value={floor}
+                onChange={(e) => setFloor(e.target.value)}
               />
             </FormControl>
 

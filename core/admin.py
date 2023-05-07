@@ -6,7 +6,7 @@ from django.urls import reverse
 from . import models
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
-from .models import Bill
+from .models import Bill, Inquiry, InquiryReply
 
 
 @admin.register(models.Room)
@@ -17,15 +17,22 @@ class RoomAdmin(admin.ModelAdmin):
         "apartment_address",
         "size",
         "price_per_month",
-        "description",
         "renter",
         "apartment",
     ]
-    list_editable = ["price_per_month", "apartment"]
+    list_editable = ["price_per_month", "apartment", "renter"]
     list_filter = ["apartment"]
     list_per_page = 10
     list_select_related = ["apartment"]
-    search_fields = ["size", "apartment_address"]
+    search_fields = [
+        "size",
+        "apartment__address",
+        "apartment__city",
+        "apartment__street",
+        "apartment__building_number",
+        "apartment__apartment_number",
+        "apartment__floor",
+    ]
 
     def apartment_address(self, room):
         return room.apartment.address
@@ -37,7 +44,14 @@ class RoomAdmin(admin.ModelAdmin):
 @admin.register(models.Apartment)
 class ApartmentAdmin(admin.ModelAdmin):
     list_display = ["id", "address", "rooms_count", "owner"]
-    search_fields = ["address"]
+    search_fields = [
+        "address",
+        "city",
+        "street",
+        "building_number",
+        "apartment_number",
+        "floor",
+    ]
 
     @admin.display(ordering="rooms_count")
     def rooms_count(self, apartment):
@@ -116,6 +130,37 @@ class BillAdmin(admin.ModelAdmin):
             return queryset
         else:
             return queryset.filter(apartment__owner=request.user)
+
+
+class InquiryReplyInline(admin.TabularInline):
+    model = InquiryReply
+
+
+@admin.register(Inquiry)
+class InquiryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "apartment",
+        "sender",
+        "receiver",
+        "type",
+        "status",
+        "created_at",
+    )
+    list_filter = ("type", "status", "created_at")
+    search_fields = (
+        "apartment__address",
+        "message",
+        "sender__email",
+        "receiver__email",
+    )
+    inlines = [InquiryReplyInline]
+
+
+@admin.register(InquiryReply)
+class InquiryReplyAdmin(admin.ModelAdmin):
+    list_display = ("id", "inquiry", "sender", "created_at")
+    search_fields = ("inquiry__apartment__address", "message", "sender__email")
 
 
 admin.site.register(Bill, BillAdmin)

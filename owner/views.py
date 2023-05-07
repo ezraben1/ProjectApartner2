@@ -13,6 +13,15 @@ class OwnerApartmentViewSet(ApartmentViewSet):
     serializer_class = serializers.ApartmentSerializer
     permission_classes = [permissions.IsAuthenticated, IsApartmentOwner]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            apartment = serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def update_apartment(self, request, apartment):
         data = request.data
         serializer = self.get_serializer(apartment, data=data, partial=True)

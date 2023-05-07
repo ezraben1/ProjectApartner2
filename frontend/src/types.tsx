@@ -16,11 +16,17 @@ export interface CustomUser {
 export interface Apartment {
   id: number;
   owner: CustomUser;
+  owner_id: number;
   owner_email: string;
   owner_first_name: string;
   owner_last_name: string;
   owner_phone: string;
   address: string;
+  city: string;
+  street: string;
+  building_number: string;
+  apartment_number: string;
+  floor: string;
   description: string;
   size: string;
   balcony: boolean | null;
@@ -40,6 +46,11 @@ export interface ApartmentImage {
 }
 
 export interface Room {
+  city: string;
+  street: string;
+  building_number: string;
+  apartment_number: string;
+  floor: string;
   id: number;
   apartment: Apartment;
   renter: CustomUser | null;
@@ -112,6 +123,11 @@ export interface ApartmentAPI {
   owner_last_name: string;
   owner_phone: string | null;
   address: string;
+  city: string;
+  street: string;
+  building_number: string;
+  apartment_number: string;
+  floor: string;
   description: string;
   size: string;
   balcony: boolean;

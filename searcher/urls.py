@@ -24,17 +24,7 @@ urlpatterns = [
     path(
         "searcher-search/<int:pk>/inquiries/",
         ApartmentInquiryViewSet.as_view({"get": "list", "post": "create"}),
-        name="renter-inquiries",
-    ),
-    path(
-        "searcher-search/<int:apartment_id>/room/<int:pk>/",
-        RoomViewSet.as_view({"get": "retrieve"}),
-        name="room-detail",
-    ),
-    path(
-        "searcher-search/<int:apartment_id>/room/<int:pk>/contact-owner/",
-        RoomViewSet.as_view({"post": "contact_owner"}),
-        name="room-contact-owner",
+        name="searcher-inquiries",
     ),
     path(
         "searcher-search/<int:apartment_id>/room/<int:pk>/contracts/",

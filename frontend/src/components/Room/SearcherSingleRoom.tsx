@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Box,
-  VStack,
   Text,
   Button,
-  Image,
   HStack,
   Heading,
   Stack,
@@ -14,12 +12,33 @@ import {
 import { Room } from "../../types";
 import { useAuthorizedData } from "../../utils/useAuthorizedData";
 import ImageGallery from "../images/ImageGallery";
+import InquiryForm from "../Inquiry/InquiryForm";
+import { fetchUserId } from "../../utils/userId";
 
 const SearcherSingleRoom = () => {
   const { roomId } = useParams();
+  const [searcherID, setSearcherID] = useState<string | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+
   const [roomData, status] = useAuthorizedData<Room | null>(
     `/searcher/searcher-search/${roomId}/`
   );
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const id = await fetchUserId();
+      setSearcherID(id);
+      setUserLoading(false);
+    };
+
+    getUserId();
+  }, []);
+
+  useEffect(() => {
+    if (searcherID) {
+      console.log("Searcher ID:", searcherID);
+    }
+  }, [searcherID]);
 
   if (status === "loading") {
     return <Text>Loading...</Text>;
@@ -33,7 +52,7 @@ const SearcherSingleRoom = () => {
     return <Text>No data available.</Text>;
   }
 
-  const { description, size, price_per_month, window, images, apartment } =
+  const { description, size, price_per_month, window, images, apartment, id } =
     roomData;
 
   return (
@@ -143,18 +162,12 @@ const SearcherSingleRoom = () => {
           </Stack>
         </Stack>
         <HStack mt={6} spacing={6}>
-          <Button
-            colorScheme="blue"
-            onClick={() => console.log("Send Inquiry")}
-          >
-            Send Inquiry
+          <Button colorScheme="green">
+            <Link to={`/searcher/searcher-search/${roomId}/contracts/`}>
+              Show Contract
+            </Link>
           </Button>
-          <Button
-            colorScheme="green"
-            onClick={() => console.log("Show Contract")}
-          >
-            Show Contract
-          </Button>
+
           <Button
             colorScheme="teal"
             onClick={() => console.log("Sign Contract")}
@@ -162,6 +175,15 @@ const SearcherSingleRoom = () => {
             Sign Contract
           </Button>
         </HStack>
+
+        {apartment && apartment.owner && searcherID !== null && (
+          <InquiryForm
+            url={`/searcher/searcher-search/${roomId}/inquiries/?is_room=true`}
+            sender={searcherID}
+            receiver_id={apartment.owner_id}
+            apartmentID={apartment.id}
+          />
+        )}
       </Box>
     </Flex>
   );

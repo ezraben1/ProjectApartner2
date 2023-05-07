@@ -16,12 +16,18 @@ class RenterApartmentSerializer(serializers.ModelSerializer):
         model = Apartment
         fields = [
             "id",
-            "owner_id",
+            "owner",
             "owner_email",
             "owner_first_name",
             "owner_last_name",
             "owner_phone",
+            "owner_id",
             "address",
+            "city",
+            "street",
+            "building_number",
+            "apartment_number",
+            "floor",
             "description",
             "size",
             "balcony",
@@ -29,5 +35,6 @@ class RenterApartmentSerializer(serializers.ModelSerializer):
             "smoking_allowed",
             "allowed_pets",
             "ac",
+            "rooms",
             "images",
         ]

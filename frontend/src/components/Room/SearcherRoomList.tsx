@@ -18,7 +18,7 @@ interface RoomListProps {
   apartmentId: number | null;
 }
 
-const RoomList: React.FC<RoomListProps> = ({ rooms }) => {
+const SearcherRoomList: React.FC<RoomListProps> = ({ rooms }) => {
   return (
     <Box pt={8}>
       <Heading as="h1" size="xl" textAlign="center" mb={8}>
@@ -67,7 +67,13 @@ const RoomList: React.FC<RoomListProps> = ({ rooms }) => {
                     <Text fontSize="md" fontWeight="bold">
                       Room Details
                     </Text>
-                    <Text fontSize="md">Description: {room.description}</Text>
+                    <Text fontSize="md">
+                      Description:{" "}
+                      {room.description
+                        ? room.description.split(" ").slice(0, 8).join(" ") +
+                          "..."
+                        : "N/A"}
+                    </Text>
                     <Text fontSize="md">Size: {room.size} sqm</Text>
                     <Text fontSize="md">Price: {room.price_per_month} $</Text>
                     <Text fontSize="md">
@@ -106,4 +112,4 @@ const RoomList: React.FC<RoomListProps> = ({ rooms }) => {
   );
 };
 
-export default RoomList;
+export default SearcherRoomList;

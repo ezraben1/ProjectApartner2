@@ -80,15 +80,6 @@ class RenterRoomViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=["post"], url_path="contact-owner")
-    def contact_owner(self, request, pk=None):
-        room = self.get_object()
-        owner = room.apartment.owner
-        subject = f"Inquiry about {room.address}"
-        message = f"Hi {owner.first_name},\n\nI am interested in renting your room at {room.address}. Please let me know if it's still available and if I can come by for a visit.\n\nThanks,\n{request.user.first_name}"
-        send_mail(subject, message, [owner.email])
-        return Response({"message": "Email sent to owner."})
-
 
 class RenterBillViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BillSerializer
@@ -97,11 +88,11 @@ class RenterBillViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        room = user.rooms_rented.first()
-        if room:
+        try:
+            room = user.rooms_rented
             apartment = room.apartment
             return Bill.objects.filter(apartment=apartment)
-        else:
+        except Room.DoesNotExist:
             return Bill.objects.none()
 
     @action(detail=True, methods=["post"])

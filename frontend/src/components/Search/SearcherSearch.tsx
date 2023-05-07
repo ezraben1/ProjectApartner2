@@ -2,24 +2,21 @@ import { useEffect, useState } from "react";
 import { useAuthorizedData } from "../../utils/useAuthorizedData";
 import { Room } from "../../types";
 import SearchFilters from "./SearchFilters";
+import Pagination from "../../layout/Pagination";
 
 const SearcherSearch: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [filteredRooms, setFilteredRooms] = useState<Room[] | null>(null);
+  const [url, setUrl] = useState("/searcher/searcher-search/");
 
   const [roomData, status] = useAuthorizedData<{
     count: number;
     next: string | null;
     previous: string | null;
     results: Room[];
-  }>("/searcher/searcher-search/");
-  const handleFilterSubmit = (filters: { [key: string]: any }) => {
-    const filtered = rooms.filter((room) => {
-      return room.apartment.address
-        .toLowerCase()
-        .includes(filters.address.toLowerCase());
-    });
-    setRooms(filtered);
+  }>(url);
+
+  const handleFilterSubmit = (newUrl: string) => {
+    setUrl(newUrl);
   };
 
   useEffect(() => {
@@ -28,9 +25,18 @@ const SearcherSearch: React.FC = () => {
     }
   }, [roomData, status]);
 
+  const onPaginate = (url: string) => {
+    setUrl(url);
+  };
+
   return (
     <div>
-      <SearchFilters onFilterSubmit={handleFilterSubmit} />
+      <SearchFilters onFilterSubmit={handleFilterSubmit} rooms={rooms} />
+      <Pagination
+        next={roomData?.next ?? null}
+        previous={roomData?.previous ?? null}
+        onPaginate={onPaginate}
+      />
     </div>
   );
 };

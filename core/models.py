@@ -22,7 +22,7 @@ class CustomUser(AbstractUser):
         Permission, related_name="custom_users", blank=True
     )
 
-    is_superuser = models.BooleanField(default=False, null=True)
+    is_superuser = models.BooleanField(default=False)
     first_name = models.CharField(max_length=30, blank=True, default="")
     last_name = models.CharField(max_length=30, blank=True, default="")
     is_staff = models.BooleanField(default=False)
@@ -31,24 +31,53 @@ class CustomUser(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     phone = PhoneNumberField(blank=True, null=True)
 
+    age = models.PositiveIntegerField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, default="")
+    bio = models.TextField(blank=True, default="")
+
+    preferred_location = models.CharField(max_length=100, blank=True, default="")
+    preferred_roommates = models.CharField(max_length=100, blank=True, default="")
+    preferred_rent = models.PositiveIntegerField(blank=True, null=True)
+
 
 class Apartment(models.Model):
-    owner = models.ForeignKey(
+    owner = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
         related_name="apartments_owned",
         default=None,
         help_text=_("The user that owns the apartment."),
     )
-    address = models.CharField(
-        max_length=255, help_text=_("The address of the apartment.")
+    city = models.CharField(
+        max_length=100,
+        help_text=_("The city where the apartment is located."),
+        null=True,
+    )
+    street = models.CharField(
+        max_length=100,
+        help_text=_("The street where the apartment is located."),
+        null=True,
+    )
+    building_number = models.CharField(
+        max_length=10,
+        help_text=_("The building number of the apartment."),
+        null=True,
+    )
+    apartment_number = models.CharField(
+        max_length=10,
+        help_text=_("The apartment number."),
+        null=True,
+    )
+    floor = models.IntegerField(
+        help_text=_("The floor of the apartment."),
+        null=True,
     )
     description = models.TextField(
         blank=True, null=True, help_text=_("A description of the apartment.")
     )
     size = models.CharField(max_length=50, help_text=_("The size of the apartment."))
     balcony = models.BooleanField(
-        default=False, null=True, help_text=_("Whether the apartment has a balcony.")
+        default=False, help_text=_("Whether the apartment has a balcony.")
     )
     bbq_allowed = models.BooleanField(
         default=False, help_text=_("Whether BBQs are allowed on the apartment.")
@@ -63,11 +92,15 @@ class Apartment(models.Model):
         default=False, help_text=_("Whether the apartment has air conditioning.")
     )
 
+    @property
+    def address(self):
+        return f"{self.street} {self.building_number}, Apt {self.apartment_number}, Floor {self.floor}, {self.city}"
+
     def __str__(self) -> str:
-        return self.address
+        return f"{self.street} {self.building_number}, Apt {self.apartment_number}, {self.city}"
 
     class Meta:
-        ordering = ["address"]
+        ordering = ["city", "street", "building_number", "apartment_number"]
 
 
 class ApartmentImage(models.Model):
@@ -89,7 +122,9 @@ class ApartmentImage(models.Model):
 
 class Contract(models.Model):
     owner = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="contracts_owned"
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="contracts_owned",
     )
     start_date = models.DateField()
     end_date = models.DateField()
@@ -107,7 +142,7 @@ class Room(models.Model):
     apartment = models.ForeignKey(
         Apartment, on_delete=models.PROTECT, related_name="rooms"
     )
-    renter = models.ForeignKey(
+    renter = models.OneToOneField(
         CustomUser,
         on_delete=models.SET_NULL,
         related_name="rooms_rented",
