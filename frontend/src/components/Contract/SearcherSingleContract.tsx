@@ -3,12 +3,17 @@ import { Contract } from "../../types";
 import { useAuthorizedData } from "../../utils/useAuthorizedData";
 import { useEffect, useState } from "react";
 import { Container, Card, ListGroup, ListGroupItem } from "react-bootstrap";
+import { handleDownloadFile } from "../images/handleDownloadFile";
+import { Button } from "@chakra-ui/react";
 
-const SingleContract: React.FC = () => {
-  const { roomId } = useParams();
+const SearcherSingleContract: React.FC = () => {
+  const { roomId, contractId } = useParams<{
+    roomId: string;
+    contractId: string;
+  }>();
   const [contract, setContract] = useState<Contract | null>(null);
   const [contractData, status] = useAuthorizedData<Contract>(
-    `/searcher/searcher-search/${roomId}/contracts/`
+    `/searcher/searcher-search/${roomId}/contract/${7}/`
   );
 
   useEffect(() => {
@@ -16,6 +21,15 @@ const SingleContract: React.FC = () => {
       setContract(contractData);
     }
   }, [contractData, status]);
+
+  const handleDownload = () => {
+    handleDownloadFile(
+      `/searcher/searcher-search/${roomId}/contract/${contract?.id}/download/`,
+      `${contract?.id || ""}`,
+      "contract",
+      "pdf"
+    );
+  };
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -44,8 +58,11 @@ const SingleContract: React.FC = () => {
           </ListGroupItem>
         </ListGroup>
       </Card>
+      <Button colorScheme="green" onClick={handleDownload}>
+        Download Contract
+      </Button>
     </Container>
   );
 };
 
-export default SingleContract;
+export default SearcherSingleContract;

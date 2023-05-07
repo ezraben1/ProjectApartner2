@@ -1,3 +1,5 @@
+import os
+from django.http import FileResponse, Http404
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import permissions
@@ -10,6 +12,7 @@ from core.pagination import DefaultPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework import status
+from core.permissions import IsAuthenticated, IsSearcher
 
 from searcher.serializers import SearcherRoomSerializer
 
@@ -49,13 +52,47 @@ class SearcherRoomViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Room.objects.filter(renter=None)
         return queryset
 
-    @action(
-        detail=True,
-        url_path="contracts",
-        permission_classes=[permissions.IsAuthenticated],
-    )
-    def room_contracts(self, request, pk=None):
-        room = self.get_object()
-        contract = Contract.objects.filter(room=room).first()
-        serializer = serializers.ContractSerializer(contract)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SearcherContractViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.ContractSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.user_type == "searcher":
+            try:
+                room_id = self.kwargs["room_id"]
+                contract_id = self.kwargs["pk"]
+                contract = Contract.objects.select_related("room__apartment").get(
+                    id=contract_id,
+                    room__id=room_id,
+                )
+            except Contract.DoesNotExist:
+                raise Http404
+            return Contract.objects.filter(id=contract.id)
+        else:
+            return Contract.objects.none()
+
+    @action(detail=True, methods=["get"], url_path="download")
+    def download(self, request, *args, **kwargs):
+        contract = self.get_object()
+        if not contract.file:
+            return Response(
+                {"error": "No file available."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        file_path = contract.file.path
+        if os.path.exists(file_path):
+            response = FileResponse(
+                open(file_path, "rb"), content_type="application/octet-stream"
+            )
+            response[
+                "Content-Disposition"
+            ] = f"attachment; filename={os.path.basename(file_path)}"
+            return response
+        else:
+            return Response(
+                {"error": "File not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )

@@ -1,7 +1,7 @@
 import mimetypes
 import os
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from core.permissions import IsAuthenticated, IsRoomRenter
@@ -58,27 +58,12 @@ class RenterRoomViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Room.objects.filter(renter=self.request.user)
 
-    def retrieve(self, request, pk=None):
-        if not pk:
-            queryset = self.get_queryset()
-            if not queryset:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            pk = queryset.first().pk
-        instance = get_object_or_404(self.get_queryset(), pk=pk)
-        serializer = self.get_serializer(instance)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset().first()
+        if not queryset:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(queryset)
         return Response(serializer.data)
-
-    @action(detail=False, methods=["post"], url_path="write-review")
-    def write_review(self, request, pk=None):
-        room = self.get_object()
-        serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            review = serializer.save(room=room, user=request.user)
-            return Response(
-                ReviewSerializer(review).data, status=status.HTTP_201_CREATED
-            )
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RenterBillViewSet(viewsets.ReadOnlyModelViewSet):
@@ -139,10 +124,32 @@ class RenterContractViewSet(viewsets.ModelViewSet):
             contract_id = self.kwargs["pk"]
             try:
                 contract = Contract.objects.select_related("room__apartment").get(
-                    id=contract_id, room_id=room_id, room__renter=user
+                    id=contract_id, room__id=room_id, room__renter=user
                 )
             except Contract.DoesNotExist:
                 raise Http404
             return Contract.objects.filter(id=contract.id)
         else:
             return Contract.objects.none()
+
+    @action(detail=True, methods=["get"], url_path="download")
+    def download(self, request, *args, **kwargs):
+        contract = self.get_object()
+        if not contract.file:
+            return Response(
+                {"error": "No file available."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        file_path = contract.file.path
+        if os.path.exists(file_path):
+            response = FileResponse(
+                open(file_path, "rb"), content_type="application/octet-stream"
+            )
+            response[
+                "Content-Disposition"
+            ] = f"attachment; filename={os.path.basename(file_path)}"
+            return response
+        else:
+            return Response(
+                {"error": "File not found."}, status=status.HTTP_404_NOT_FOUND
+            )

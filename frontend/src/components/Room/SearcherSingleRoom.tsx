@@ -18,7 +18,8 @@ import { fetchUserId } from "../../utils/userId";
 const SearcherSingleRoom = () => {
   const { roomId } = useParams();
   const [searcherID, setSearcherID] = useState<string | null>(null);
-  const [userLoading, setUserLoading] = useState(true);
+  const [, setUserLoading] = useState(true);
+  const [contractId, setContractId] = useState<number | null>(null);
 
   const [roomData, status] = useAuthorizedData<Room | null>(
     `/searcher/searcher-search/${roomId}/`
@@ -40,6 +41,26 @@ const SearcherSingleRoom = () => {
     }
   }, [searcherID]);
 
+  useEffect(() => {
+    const fetchContractId = async () => {
+      try {
+        const response = await fetch(
+          `/searcher/searcher-search/${roomId}/contract/`
+        );
+        const data = await response.json();
+        if (data && data.id) {
+          setContractId(data.id);
+        }
+      } catch (error) {
+        console.error("Error fetching contract ID:", error);
+      }
+    };
+
+    if (roomData) {
+      fetchContractId();
+    }
+  }, [roomData, roomId]);
+
   if (status === "loading") {
     return <Text>Loading...</Text>;
   }
@@ -51,8 +72,9 @@ const SearcherSingleRoom = () => {
   if (!roomData) {
     return <Text>No data available.</Text>;
   }
+  console.log(roomData);
 
-  const { description, size, price_per_month, window, images, apartment, id } =
+  const { description, size, price_per_month, window, images, apartment } =
     roomData;
 
   return (
@@ -163,7 +185,9 @@ const SearcherSingleRoom = () => {
         </Stack>
         <HStack mt={6} spacing={6}>
           <Button colorScheme="green">
-            <Link to={`/searcher/searcher-search/${roomId}/contracts/`}>
+            <Link
+              to={`/searcher/searcher-search/${roomId}/contracts/${roomData.contract.id}`}
+            >
               Show Contract
             </Link>
           </Button>

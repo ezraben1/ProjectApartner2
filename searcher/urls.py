@@ -7,7 +7,7 @@ from core.views import (
     ReviewViewSet,
     RoomViewSet,
 )
-from searcher.views import SearcherRoomViewSet
+from searcher.views import SearcherContractViewSet, SearcherRoomViewSet
 
 app_name = "searcher"
 
@@ -37,8 +37,18 @@ urlpatterns = [
         name="room-sign-contract",
     ),
     path(
-        "searcher-search/<int:apartment_id>/room/<int:room_id>/contract/<int:pk>/",
-        ContractViewSet.as_view({"get": "retrieve"}),
+        "searcher-search/<int:room_id>/contract/",
+        SearcherContractViewSet.as_view({"get": "retrieve"}),
+        name="contract",
+    ),
+    path(
+        "searcher-search/<int:room_id>/contract/<int:pk>/",
+        SearcherContractViewSet.as_view({"get": "retrieve"}),
         name="contract-detail",
+    ),
+    path(
+        "searcher-search/<int:room_id>/contract/<int:pk>/download/",
+        SearcherContractViewSet.as_view({"get": "download"}),
+        name="contract-download",
     ),
 ] + router.urls

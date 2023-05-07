@@ -29,6 +29,8 @@ import OwnerSingleBill from "./components/Bill/OwnerSingleBill";
 import SearcherSingleRoom from "./components/Room/SearcherSingleRoom";
 import InquirySearch from "./components/Inquiry/InquirySearch";
 import SearcherSingleContract from "./components/Contract/SearcherSingleContract";
+import RenterSingleRoom from "./components/Room/RetnerSingleRoom";
+import RenterSingleContract from "./components/Contract/RenterSingleContract";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -94,8 +96,11 @@ function App() {
                 path="/renter/my-bills/:billId"
                 element={<RenterSingleBill />}
               />
-
-              <Route path="/test" element={<MinimalExample />} />
+              <Route path="/renter/my-room/" element={<RenterSingleRoom />} />
+              <Route
+                path="/renter/my-room/:roomId/contracts/:contractId"
+                element={<RenterSingleContract />}
+              />
 
               <Route path="/searcher" element={<SearcherPage />} />
               <Route path="/searcher/*" element={<SearcherRoutes />} />
@@ -105,7 +110,7 @@ function App() {
                 element={<SearcherSingleRoom />}
               />
               <Route
-                path="/searcher/searcher-search/:roomId/contracts"
+                path="/searcher/searcher-search/:roomId/contracts/:contractId"
                 element={<SearcherSingleContract />}
               />
             </Routes>

@@ -43,15 +43,15 @@ class IsApartmentOwner(permissions.BasePermission):
 
 
 class IsRoomRenter(BasePermission):
-    message = "You must be the renter of a room in this apartment or the owner of this apartment to view its bills."
+    message = "You must be the renter of a room in this apartment."
 
     def has_object_permission(self, request, view, obj):
         if request.user.is_authenticated and request.user.user_type == "renter":
             if isinstance(obj, Bill):
                 # Check if the user is the renter of a room in the apartment
                 apartment = obj.apartment
-                rented_rooms_in_apartment = request.user.rooms_rented.filter(
-                    apartment=apartment
+                rented_rooms_in_apartment = Room.objects.filter(
+                    apartment=apartment, renter=request.user
                 )
                 if rented_rooms_in_apartment.exists():
                     return True
@@ -64,7 +64,14 @@ class IsRoomRenter(BasePermission):
                 apartment_owner = obj.room.apartment.owner == request.user
                 if apartment_owner:
                     return True
-
+                # Check if the renter of the room is the user
+                room_renter = obj.room.renter == request.user
+                if room_renter:
+                    return True
+            elif isinstance(obj, Room):
+                # Check if the user is the renter of this room
+                if obj.renter == request.user:
+                    return True
         return False
 
 

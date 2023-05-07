@@ -30,11 +30,7 @@ urlpatterns = [
     ),
     path(
         "my-room/<int:room_id>/contracts/<int:pk>/",
-        RenterContractViewSet.as_view(
-            {
-                "get": "retrieve",
-            }
-        ),
+        RenterContractViewSet.as_view({"get": "retrieve"}),
         name="contract_detail",
     ),
     path(
@@ -51,5 +47,10 @@ urlpatterns = [
         "my-bills/<int:bill_id>/download/",
         RenterBillViewSet.as_view({"get": "download"}),
         name="bill-download-file",
+    ),
+    path(
+        "my-room/<int:room_id>/contracts/<int:pk>/download/",
+        RenterContractViewSet.as_view({"get": "download"}),
+        name="contract-download-file",
     ),
 ] + router.urls

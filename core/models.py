@@ -41,7 +41,7 @@ class CustomUser(AbstractUser):
 
 
 class Apartment(models.Model):
-    owner = models.OneToOneField(
+    owner = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name="apartments_owned",
