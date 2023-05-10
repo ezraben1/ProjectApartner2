@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-406_2can@1@=mpv&wtm5*00vfg3i3x6pi61nv5ab)2fv4o$c!i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [["apartner.herokuapp.com", "localhost", "127.0.0.1"]]
 
 
 # Application definition
@@ -104,6 +104,9 @@ WSGI_APPLICATION = "apartner.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import os
+import dj_database_url
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -113,6 +116,11 @@ DATABASES = {
         "PASSWORD": "123456",
     }
 }
+
+# Use Heroku's PostgreSQL database in production
+if "DATABASE_URL" in os.environ:
+    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
 
 AUTH_USER_MODEL = "core.CustomUser"
 
@@ -150,7 +158,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
