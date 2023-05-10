@@ -1,4 +1,1 @@
-web: gunicorn apartner.wsgi --log-file -
-web: python manage.py runserver
-web: cd frontend
-web: npm run dev
+web: python backend/manage.py collectstatic --noinput && gunicorn backend.apartner.wsgi:application --log-file -

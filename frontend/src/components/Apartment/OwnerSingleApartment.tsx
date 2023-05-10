@@ -54,7 +54,7 @@ const SingleApartment: React.FC = () => {
   }, [apartmentData, status]);
 
   // Add state for image file
-  const [, setSelectedImage] = useState<string | null>(null);
+  const [] = useState<string | null>(null);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -114,7 +114,7 @@ const SingleApartment: React.FC = () => {
   const updateApartment = (updatedApartment: Apartment) => {
     setApartment(updatedApartment);
   };
-  const [, setIsOpen] = useState(false);
+  const [] = useState(false);
 
   const imageItems = apartment?.images.map((image) => ({
     id: image.id,

@@ -7,7 +7,7 @@ import { handleDownloadFile } from "../images/handleDownloadFile";
 import { Button } from "@chakra-ui/react";
 
 const SearcherSingleContract: React.FC = () => {
-  const { roomId, contractId } = useParams<{
+  const { roomId } = useParams<{
     roomId: string;
     contractId: string;
   }>();

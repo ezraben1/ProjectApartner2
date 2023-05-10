@@ -15,7 +15,7 @@ interface RouteParams {
 const ApartmentContracts: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const { search } = useLocation();
-  const { apartmentId, roomId } = queryString.parse(search) as RouteParams;
+  const { apartmentId } = queryString.parse(search) as RouteParams;
   const [contractData, status] = useAuthorizedData<Contract[]>(
     `/owner/owner-apartments/${apartmentId}/contracts/`
   );

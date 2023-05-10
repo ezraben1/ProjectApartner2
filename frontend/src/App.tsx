@@ -7,7 +7,6 @@ import OwnerPage from "./pages/Owner/OwnerPage";
 import MyApartments from "./components/Apartment/MyApartments";
 import MyRooms from "./components/Room/MyRooms";
 import Layout from "./layout/Layout";
-import MinimalExample from "./pages/MinimalExample";
 import MyContracts from "./components/Contract/MyContracts";
 import OwnerSingleApartment from "./components/Apartment/OwnerSingleApartment";
 import RenterSingleApartment from "./components/Apartment/RenterSingleApartment";

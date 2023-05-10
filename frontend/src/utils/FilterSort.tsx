@@ -5,7 +5,6 @@ import {
   VStack,
   Heading,
   List,
-  ListItem,
   Box,
   Text,
 } from "@chakra-ui/react";
